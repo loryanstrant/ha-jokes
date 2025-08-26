@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Dad Jokes Setup",
+        "description": "Configure your Dad Jokes integration",
+        "data": {
+          "refresh_interval": "Refresh interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Dad Jokes Options",
+        "description": "Configure Dad Jokes options",
+        "data": {
+          "refresh_interval": "Refresh interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes"
+    }
+  }
+}
