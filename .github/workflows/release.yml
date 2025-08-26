@@ -1,0 +1,28 @@
+name: "Release"
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create zip file
+        run: |
+          cd custom_components/ha_jokes
+          zip -r ../../ha_jokes.zip . -x "__pycache__/*" "*.pyc" "*.pyo"
+
+      - name: Upload zip to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./ha_jokes.zip
+          asset_name: ha_jokes.zip
+          tag: ${{ github.ref }}
+          overwrite: true
