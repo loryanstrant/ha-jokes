@@ -44,33 +44,29 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Dad Jokes sensor platform."""
-    refresh_interval = config_entry.options.get(
-        CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
-    )
-    
-    coordinator = DadJokesDataUpdateCoordinator(hass, refresh_interval)
-    
-    # Fetch initial data
-    await coordinator.async_config_entry_first_refresh()
+    # Get coordinator from hass.data
+    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     
     async_add_entities([DadJokesSensor(coordinator, config_entry)], True)
 
 
 class DadJokesDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching dad jokes data from the API."""
+    """Class to manage fetching data from the API."""
 
     def __init__(self, hass: HomeAssistant, refresh_interval: int) -> None:
-        """Initialize the coordinator."""
+        """Initialize."""
+        self.platforms = []
+        self._refresh_interval = refresh_interval
+        
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(minutes=refresh_interval),
         )
-        self.refresh_interval = refresh_interval
 
     async def _async_update_data(self) -> dict[str, Any]:
-        """Fetch data from API endpoint."""
+        """Update data via library."""
         try:
             async with async_timeout.timeout(10):
                 async with aiohttp.ClientSession() as session:
@@ -81,20 +77,18 @@ class DadJokesDataUpdateCoordinator(DataUpdateCoordinator):
                                 ATTR_JOKE: data.get("joke", ""),
                                 ATTR_JOKE_ID: data.get("id", ""),
                                 ATTR_LAST_UPDATED: datetime.now().isoformat(),
-                                ATTR_REFRESH_INTERVAL: self.refresh_interval,
+                                ATTR_REFRESH_INTERVAL: self._refresh_interval,
                             }
                         else:
-                            raise UpdateFailed(f"Error fetching data: {response.status}")
-        except asyncio.TimeoutError as err:
-            raise UpdateFailed("Timeout communicating with API") from err
-        except aiohttp.ClientError as err:
-            raise UpdateFailed(f"Error communicating with API: {err}") from err
-        except Exception as err:
-            raise UpdateFailed(f"Unexpected error: {err}") from err
+                            raise UpdateFailed(f"Error communicating with API: {response.status}")
+        except asyncio.TimeoutError as exception:
+            raise UpdateFailed(f"Timeout communicating with API: {exception}") from exception
+        except (aiohttp.ClientError, Exception) as exception:
+            raise UpdateFailed(f"Error communicating with API: {exception}") from exception
 
     def update_refresh_interval(self, refresh_interval: int) -> None:
         """Update the refresh interval."""
-        self.refresh_interval = refresh_interval
+        self._refresh_interval = refresh_interval
         self.update_interval = timedelta(minutes=refresh_interval)
 
 
