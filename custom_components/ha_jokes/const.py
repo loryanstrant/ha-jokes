@@ -2,10 +2,10 @@
 
 DOMAIN = "ha_jokes"
 NAME = "Dad Jokes"
-VERSION = "1.0.0"
+VERSION = "1.0.4"
 
 # API Configuration
-API_URL = "https://icanhazdadjoke.com/api"
+API_URL = "https://icanhazdadjoke.com"
 API_HEADERS = {
     "Accept": "application/json",
     "User-Agent": "Home Assistant Dad Jokes Integration",
