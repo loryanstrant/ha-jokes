@@ -7,8 +7,10 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
+from .sensor import DadJokesDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,7 +23,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Store the config entry data in hass.data
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = entry.data
+    
+    # Get refresh interval from options
+    refresh_interval = entry.options.get(
+        CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
+    )
+    
+    # Create coordinator
+    coordinator = DadJokesDataUpdateCoordinator(hass, refresh_interval)
+    
+    # Fetch initial data - this can raise ConfigEntryNotReady
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        _LOGGER.error("Error fetching initial data: %s", err)
+        raise ConfigEntryNotReady from err
+    
+    # Store coordinator in hass.data
+    hass.data[DOMAIN][entry.entry_id] = {
+        "coordinator": coordinator,
+        "data": entry.data,
+    }
     
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
