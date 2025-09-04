@@ -76,7 +76,8 @@ class DadJokesOptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
+        # Using private attribute instead of self.config_entry to avoid deprecation warning
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -93,7 +94,7 @@ class DadJokesOptionsFlow(config_entries.OptionsFlow):
                 return self.async_create_entry(title="", data=user_input)
 
         # Get current options or defaults
-        current_refresh_interval = self.config_entry.options.get(
+        current_refresh_interval = self._config_entry.options.get(
             CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
         )
 
