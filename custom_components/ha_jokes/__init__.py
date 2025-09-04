@@ -33,10 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = DadJokesDataUpdateCoordinator(hass, refresh_interval)
     
     # Fetch initial data - this can raise ConfigEntryNotReady
-    try:
-        await coordinator.async_config_entry_first_refresh()
-    except Exception as err:
-        _LOGGER.error("Error fetching initial data: %s", err)
+        _LOGGER.error("Dad Jokes integration failed to fetch initial data: %s", err)
         raise ConfigEntryNotReady from err
     
     # Store coordinator in hass.data
