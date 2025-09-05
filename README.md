@@ -85,15 +85,30 @@ attribute: joke
 name: "Dad Joke of the Moment"
 ```
 
-#### Markdown Card
+#### Markdown Card with last updated time
 ```yaml
 type: markdown
 content: |
   ## 😄 Dad Joke
   {{ state_attr('sensor.dad_joke', 'joke') }}
   
-  *Last updated: {{ state_attr('sensor.dad_joke', 'last_updated') }}*
+  *Last updated @ {{ as_datetime(state_attr('sensor.dad_joke', 'last_updated')).strftime('%H:%M %d %b %Y') }}*
 ```
+<img width="515" height="142" alt="image" src="https://github.com/user-attachments/assets/02296d98-f871-4a0f-93fe-df820ee80b16" />
+
+
+
+#### Markdown Card with time since last update
+```yaml
+type: markdown
+content: |
+  ## 😄 Dad Joke
+  {{ state_attr('sensor.dad_joke', 'joke') }}
+  
+  *Last updated: {{ relative_time(as_datetime(state_attr('sensor.dad_joke', 'last_updated'))) }} ago*
+```
+<img width="518" height="147" alt="image" src="https://github.com/user-attachments/assets/076e83af-d8e4-43a6-bdd8-02635eb8f6cb" />
+
 
 #### Custom Card with Conditional Display
 ```yaml
