@@ -5,6 +5,9 @@
 
 A custom Home Assistant integration that fetches random dad jokes from [icanhazdadjoke.com](https://icanhazdadjoke.com/) and provides them as a sensor entity.
 
+<p align="center"><img width="256" height="256" alt="icon" src="https://github.com/user-attachments/assets/ec238fee-508a-4647-9071-d93bf83a9988" /></p>
+
+
 ## Features
 
 - 🎭 Fetches random dad jokes from the icanhazdadjoke.com API
@@ -19,6 +22,7 @@ A custom Home Assistant integration that fetches random dad jokes from [icanhazd
 ## Installation
 
 ### HACS (Recommended)
+(Waiting to add this to HACS default repository as of 5th Sept 2025, for now use the below method...)
 
 1. Open HACS in your Home Assistant instance
 2. Go to "Integrations"
@@ -30,6 +34,11 @@ A custom Home Assistant integration that fetches random dad jokes from [icanhazd
 8. Restart Home Assistant
 9. Go to Configuration > Integrations
 10. Click "+ Add Integration" and search for "Dad Jokes"
+
+Or replace steps 1-6 with this:
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=loryanstrant&repository=ha-jokes&category=integration)
+
 
 ### Manual Installation
 
@@ -186,6 +195,11 @@ logger:
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Development Approach
+
+<img width="256" height="256" alt="Vibe Coding with GitHub Copilot 256x256" src="https://github.com/user-attachments/assets/c8360318-0c18-4152-be59-3f3dcf4964a1" />
+
 
 ## License
 
