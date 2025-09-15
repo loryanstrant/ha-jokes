@@ -22,20 +22,14 @@ A custom Home Assistant integration that fetches random dad jokes from [icanhazd
 ## Installation
 
 ### HACS (Recommended)
-(Waiting to add this to HACS default repository as of 5th Sept 2025, for now use the below method...)
 
 1. Open HACS in your Home Assistant instance
-2. Go to "Integrations"
-3. Click the three dots menu and select "Custom repositories"
-4. Add `https://github.com/loryanstrant/ha-jokes` as repository
-5. Set category to "Integration"
-6. Click "Add"
-7. Find "Dad Jokes" in the integration list and install it
-8. Restart Home Assistant
-9. Go to Configuration > Integrations
-10. Click "+ Add Integration" and search for "Dad Jokes"
+2. Find "Dad Jokes" in the integration list and install it
+3. Restart Home Assistant
+4. Go to Configuration > Integrations
+5. Click "+ Add Integration" and search for "Dad Jokes"
 
-Or replace steps 1-6 with this:
+Or open it directly from here:
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=loryanstrant&repository=ha-jokes&category=integration)
 
@@ -53,7 +47,7 @@ Or replace steps 1-6 with this:
 
 ### Initial Setup
 
-1. Go to **Configuration** → **Integrations**
+1. Go to **Settings** → **Devices & Services**
 2. Click **"+ Add Integration"**
 3. Search for **"Dad Jokes"**
 4. Set your desired refresh interval (1-1440 minutes, default: 5)
@@ -61,7 +55,7 @@ Or replace steps 1-6 with this:
 
 ### Changing Options
 
-1. Go to **Configuration** → **Integrations**
+1. Go to **Settings** → **Devices & Services**
 2. Find the **Dad Jokes** integration
 3. Click **"Configure"**
 4. Adjust the refresh interval as needed
