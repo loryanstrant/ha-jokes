@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timedelta
 import logging
+import random
 from typing import Any
 
 import aiohttp
@@ -20,12 +21,17 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import (
-    API_HEADERS,
-    API_URL,
+    API_HEADERS_ICANHAZDADJOKE,
+    API_HEADERS_JOKEAPI,
+    API_HEADERS_OFFICIAL,
+    API_URL_ICANHAZDADJOKE,
+    API_URL_JOKEAPI,
+    API_URL_OFFICIAL,
     ATTR_JOKE,
     ATTR_JOKE_ID,
     ATTR_LAST_UPDATED,
     ATTR_REFRESH_INTERVAL,
+    ATTR_SOURCE,
     CONF_REFRESH_INTERVAL,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
@@ -58,6 +64,28 @@ class DadJokesDataUpdateCoordinator(DataUpdateCoordinator):
         self.platforms = []
         self._refresh_interval = refresh_interval
         
+        # Define joke providers with their configurations
+        self._providers = [
+            {
+                "name": "icanhazdadjoke",
+                "url": API_URL_ICANHAZDADJOKE,
+                "headers": API_HEADERS_ICANHAZDADJOKE,
+                "parser": self._parse_icanhazdadjoke,
+            },
+            {
+                "name": "jokeapi",
+                "url": API_URL_JOKEAPI,
+                "headers": API_HEADERS_JOKEAPI,
+                "parser": self._parse_jokeapi,
+            },
+            {
+                "name": "official_joke_api",
+                "url": API_URL_OFFICIAL,
+                "headers": API_HEADERS_OFFICIAL,
+                "parser": self._parse_official_joke_api,
+            },
+        ]
+        
         super().__init__(
             hass,
             _LOGGER,
@@ -65,26 +93,102 @@ class DadJokesDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=refresh_interval),
         )
 
-    async def _async_update_data(self) -> dict[str, Any]:
-        """Update data via library."""
+    def _parse_icanhazdadjoke(self, data: dict) -> dict[str, Any]:
+        """Parse icanhazdadjoke.com response."""
+        return {
+            ATTR_JOKE: data.get("joke", ""),
+            ATTR_JOKE_ID: data.get("id", ""),
+            ATTR_SOURCE: "icanhazdadjoke.com",
+        }
+
+    def _parse_jokeapi(self, data: dict) -> dict[str, Any]:
+        """Parse JokeAPI v2 response."""
+        # JokeAPI returns different formats for single and two-part jokes
+        # We're using type=single, so we get the 'joke' field
+        joke_text = data.get("joke", "")
+        joke_id = str(data.get("id", ""))
+        
+        return {
+            ATTR_JOKE: joke_text,
+            ATTR_JOKE_ID: joke_id,
+            ATTR_SOURCE: "jokeapi.dev",
+        }
+
+    def _parse_official_joke_api(self, data: dict) -> dict[str, Any]:
+        """Parse Official Joke API response."""
+        # Official Joke API returns setup and punchline separately
+        setup = data.get("setup", "")
+        punchline = data.get("punchline", "")
+        joke_text = f"{setup} {punchline}" if setup and punchline else ""
+        joke_id = str(data.get("id", ""))
+        
+        return {
+            ATTR_JOKE: joke_text,
+            ATTR_JOKE_ID: joke_id,
+            ATTR_SOURCE: "official-joke-api.appspot.com",
+        }
+
+    async def _fetch_from_provider(
+        self, session: aiohttp.ClientSession, provider: dict
+    ) -> dict[str, Any] | None:
+        """Fetch joke from a specific provider."""
         try:
-            async with async_timeout.timeout(10):
+            async with session.get(
+                provider["url"], headers=provider["headers"]
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    parsed = provider["parser"](data)
+                    _LOGGER.debug(
+                        "Successfully fetched joke from %s", provider["name"]
+                    )
+                    return parsed
+                else:
+                    _LOGGER.warning(
+                        "Provider %s returned status %s",
+                        provider["name"],
+                        response.status,
+                    )
+                    return None
+        except Exception as err:
+            _LOGGER.warning(
+                "Error fetching from provider %s: %s", provider["name"], err
+            )
+            return None
+
+    async def _async_update_data(self) -> dict[str, Any]:
+        """Update data via library with fault tolerance."""
+        # Randomize provider order for each request
+        providers = self._providers.copy()
+        random.shuffle(providers)
+        
+        _LOGGER.debug("Attempting to fetch joke from providers in random order")
+        
+        try:
+            async with async_timeout.timeout(30):
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(API_URL, headers=API_HEADERS) as response:
-                        if response.status == 200:
-                            data = await response.json()
-                            return {
-                                ATTR_JOKE: data.get("joke", ""),
-                                ATTR_JOKE_ID: data.get("id", ""),
-                                ATTR_LAST_UPDATED: datetime.now().isoformat(),
-                                ATTR_REFRESH_INTERVAL: self._refresh_interval,
-                            }
-                        else:
-                            raise UpdateFailed(f"Error communicating with API: {response.status}")
+                    # Try each provider until one succeeds
+                    for provider in providers:
+                        result = await self._fetch_from_provider(session, provider)
+                        if result:
+                            # Add common attributes
+                            result[ATTR_LAST_UPDATED] = datetime.now().isoformat()
+                            result[ATTR_REFRESH_INTERVAL] = self._refresh_interval
+                            return result
+                    
+                    # If all providers failed
+                    raise UpdateFailed("All joke providers failed to respond")
+                    
         except asyncio.TimeoutError as exception:
-            raise UpdateFailed(f"Timeout communicating with API: {exception}") from exception
-        except (aiohttp.ClientError, Exception) as exception:
-            raise UpdateFailed(f"Error communicating with API: {exception}") from exception
+            raise UpdateFailed(
+                f"Timeout communicating with joke APIs: {exception}"
+            ) from exception
+        except UpdateFailed:
+            raise
+        except Exception as exception:
+            raise UpdateFailed(
+                f"Error communicating with joke APIs: {exception}"
+            ) from exception
 
     def update_refresh_interval(self, refresh_interval: int) -> None:
         """Update the refresh interval."""
@@ -123,6 +227,7 @@ class DadJokesSensor(CoordinatorEntity, SensorEntity):
         return {
             ATTR_JOKE: self.coordinator.data.get(ATTR_JOKE, ""),
             ATTR_JOKE_ID: self.coordinator.data.get(ATTR_JOKE_ID, ""),
+            ATTR_SOURCE: self.coordinator.data.get(ATTR_SOURCE, ""),
             ATTR_LAST_UPDATED: self.coordinator.data.get(ATTR_LAST_UPDATED, ""),
             ATTR_REFRESH_INTERVAL: self.coordinator.data.get(ATTR_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL),
         }
