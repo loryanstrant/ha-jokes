@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Dad Jokes Setup",
-        "description": "Configure your Dad Jokes integration",
+        "title": "Jokes Setup",
+        "description": "Configure your Jokes integration",
         "data": {
           "refresh_interval": "Refresh interval (minutes)"
         }
@@ -16,8 +16,8 @@
   "options": {
     "step": {
       "init": {
-        "title": "Dad Jokes Options",
-        "description": "Configure Dad Jokes options",
+        "title": "Jokes Options",
+        "description": "Configure Jokes options",
         "data": {
           "refresh_interval": "Refresh interval (minutes)"
         }

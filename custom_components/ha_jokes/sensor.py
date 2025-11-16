@@ -1,4 +1,4 @@
-"""Dad Jokes sensor platform."""
+"""Jokes sensor platform."""
 from __future__ import annotations
 
 import asyncio
@@ -49,14 +49,14 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Dad Jokes sensor platform."""
+    """Set up the Jokes sensor platform."""
     # Get coordinator from hass.data
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     
-    async_add_entities([DadJokesSensor(coordinator, config_entry)], True)
+    async_add_entities([JokesSensor(coordinator, config_entry)], True)
 
 
-class DadJokesDataUpdateCoordinator(DataUpdateCoordinator):
+class JokesDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     def __init__(self, hass: HomeAssistant, refresh_interval: int) -> None:
@@ -196,12 +196,12 @@ class DadJokesDataUpdateCoordinator(DataUpdateCoordinator):
         self.update_interval = timedelta(minutes=refresh_interval)
 
 
-class DadJokesSensor(CoordinatorEntity, SensorEntity):
-    """Representation of a Dad Jokes sensor."""
+class JokesSensor(CoordinatorEntity, SensorEntity):
+    """Representation of a Jokes sensor."""
 
     def __init__(
         self,
-        coordinator: DadJokesDataUpdateCoordinator,
+        coordinator: JokesDataUpdateCoordinator,
         config_entry: ConfigEntry,
     ) -> None:
         """Initialize the sensor."""

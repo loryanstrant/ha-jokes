@@ -1,6 +1,6 @@
 {
   "domain": "ha_jokes",
-  "name": "Dad Jokes",
+  "name": "Jokes",
   "codeowners": ["@loryanstrant"],
   "config_flow": true,
   "dependencies": [],
@@ -8,5 +8,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/loryanstrant/ha-jokes/issues",
   "requirements": ["aiohttp>=3.8.0"],
-  "version": "1.1.0"
+  "version": "1.2.0"
 }

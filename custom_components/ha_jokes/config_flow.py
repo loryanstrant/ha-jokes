@@ -1,4 +1,4 @@
-"""Config flow for Dad Jokes integration."""
+"""Config flow for Jokes integration."""
 from __future__ import annotations
 
 import logging
@@ -23,8 +23,8 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class DadJokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Dad Jokes."""
+class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for Jokes."""
 
     VERSION = 1
 
@@ -66,13 +66,13 @@ class DadJokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
-    ) -> DadJokesOptionsFlow:
+    ) -> JokesOptionsFlow:
         """Get the options flow for this handler."""
-        return DadJokesOptionsFlow(config_entry)
+        return JokesOptionsFlow(config_entry)
 
 
-class DadJokesOptionsFlow(config_entries.OptionsFlow):
-    """Handle options flow for Dad Jokes."""
+class JokesOptionsFlow(config_entries.OptionsFlow):
+    """Handle options flow for Jokes."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
