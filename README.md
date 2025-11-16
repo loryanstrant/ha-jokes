@@ -279,7 +279,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Credits
 
-- Dad jokes provided by:
+- Jokes provided by:
   - [icanhazdadjoke.com](https://icanhazdadjoke.com/)
   - [JokeAPI v2](https://v2.jokeapi.dev/) by Sven Fehler
   - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz
