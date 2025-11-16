@@ -1,4 +1,4 @@
-"""The Dad Jokes integration."""
+"""The Jokes integration."""
 from __future__ import annotations
 
 import logging
@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN, CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
-from .sensor import DadJokesDataUpdateCoordinator
+from .sensor import JokesDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Dad Jokes from a config entry."""
-    _LOGGER.debug("Setting up Dad Jokes integration")
+    """Set up Jokes from a config entry."""
+    _LOGGER.debug("Setting up Jokes integration")
     
     # Store the config entry data in hass.data
     hass.data.setdefault(DOMAIN, {})
@@ -30,13 +30,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
     
     # Create coordinator
-    coordinator = DadJokesDataUpdateCoordinator(hass, refresh_interval)
+    coordinator = JokesDataUpdateCoordinator(hass, refresh_interval)
     
     # Fetch initial data - this can raise ConfigEntryNotReady
     try:
         await coordinator.async_config_entry_first_refresh()
     except Exception as err:
-        _LOGGER.error("Dad Jokes integration failed to fetch initial data: %s", err)
+        _LOGGER.error("Jokes integration failed to fetch initial data: %s", err)
         raise ConfigEntryNotReady from err
     
     # Store coordinator in hass.data
@@ -56,7 +56,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    _LOGGER.debug("Unloading Dad Jokes integration")
+    _LOGGER.debug("Unloading Jokes integration")
     
     # Unload platforms
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

@@ -1,28 +1,28 @@
-"""Constants for the Dad Jokes integration."""
+"""Constants for the Jokes integration."""
 
 DOMAIN = "ha_jokes"
-NAME = "Dad Jokes"
-VERSION = "1.1.0"
+NAME = "Jokes"
+VERSION = "1.2.0"
 
 # API Configuration for icanhazdadjoke.com
 API_URL_ICANHAZDADJOKE = "https://icanhazdadjoke.com"
 API_HEADERS_ICANHAZDADJOKE = {
     "Accept": "application/json",
-    "User-Agent": "Home Assistant Dad Jokes Integration",
+    "User-Agent": "Home Assistant Jokes Integration",
 }
 
 # API Configuration for JokeAPI v2
 API_URL_JOKEAPI = "https://v2.jokeapi.dev/joke/Any?safe-mode&type=single"
 API_HEADERS_JOKEAPI = {
     "Accept": "application/json",
-    "User-Agent": "Home Assistant Dad Jokes Integration",
+    "User-Agent": "Home Assistant Jokes Integration",
 }
 
 # API Configuration for Official Joke API
 API_URL_OFFICIAL = "https://official-joke-api.appspot.com/random_joke"
 API_HEADERS_OFFICIAL = {
     "Accept": "application/json",
-    "User-Agent": "Home Assistant Dad Jokes Integration",
+    "User-Agent": "Home Assistant Jokes Integration",
 }
 
 # Legacy API constants (for backward compatibility)
@@ -35,7 +35,7 @@ MIN_REFRESH_INTERVAL = 1     # minute
 MAX_REFRESH_INTERVAL = 1440  # 24 hours in minutes
 
 # Sensor Configuration
-SENSOR_NAME = "Dad Joke"
+SENSOR_NAME = "Joke"
 SENSOR_ICON = "mdi:emoticon-happy-outline"
 
 # Configuration Keys

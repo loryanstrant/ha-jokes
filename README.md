@@ -1,9 +1,9 @@
-# Home Assistant Dad Jokes Integration
+# Home Assistant Jokes Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![GitHub release](https://img.shields.io/github/release/loryanstrant/ha-jokes.svg)](https://github.com/loryanstrant/ha-jokes/releases)
 
-A custom Home Assistant integration that fetches random dad jokes from multiple sources and provides them as a sensor entity.
+A custom Home Assistant integration that fetches random jokes from multiple sources and provides them as a sensor entity.
 
 <p align="center"><img width="256" height="256" alt="icon" src="https://github.com/user-attachments/assets/ec238fee-508a-4647-9071-d93bf83a9988" /></p>
 
@@ -26,10 +26,10 @@ A custom Home Assistant integration that fetches random dad jokes from multiple 
 ### HACS (Recommended)
 
 1. Open HACS in your Home Assistant instance
-2. Find "Dad Jokes" in the integration list and install it
+2. Find "Jokes" in the integration list and install it
 3. Restart Home Assistant
 4. Go to Configuration > Integrations
-5. Click "+ Add Integration" and search for "Dad Jokes"
+5. Click "+ Add Integration" and search for "Jokes"
 
 Or open it directly from here:
 
@@ -43,7 +43,7 @@ Or open it directly from here:
 3. Copy the `custom_components/ha_jokes` folder to your Home Assistant `custom_components` directory
 4. Restart Home Assistant
 5. Go to Configuration > Integrations
-6. Click "+ Add Integration" and search for "Dad Jokes"
+6. Click "+ Add Integration" and search for "Jokes"
 
 ## Configuration
 
@@ -51,14 +51,14 @@ Or open it directly from here:
 
 1. Go to **Settings** → **Devices & Services**
 2. Click **"+ Add Integration"**
-3. Search for **"Dad Jokes"**
+3. Search for **"Jokes"**
 4. Set your desired refresh interval (1-1440 minutes, default: 5)
 5. Click **"Submit"**
 
 ### Changing Options
 
 1. Go to **Settings** → **Devices & Services**
-2. Find the **Dad Jokes** integration
+2. Find the **Jokes** integration
 3. Click **"Configure"**
 4. Adjust the refresh interval as needed
 5. Click **"Submit"**
@@ -67,7 +67,7 @@ Or open it directly from here:
 
 After installation, the integration creates a sensor entity:
 
-- **Entity ID**: `sensor.dad_joke`
+- **Entity ID**: `sensor.joke`
 - **State**: "OK" when successful, "Error" when failed
 - **Icon**: 🙂 (mdi:emoticon-happy-outline)
 
@@ -86,20 +86,20 @@ The sensor provides the following attributes:
 #### Simple Entity Card
 ```yaml
 type: entity
-entity: sensor.dad_joke
+entity: sensor.joke
 attribute: joke
-name: "Dad Joke of the Moment"
+name: "Joke of the Moment"
 ```
 
 #### Markdown Card with last updated time
 ```yaml
 type: markdown
 content: |
-  ## 😄 Dad Joke
-  {{ state_attr('sensor.dad_joke', 'joke') }}
+  ## 😄 Joke
+  {{ state_attr('sensor.joke', 'joke') }}
   
-  *Last updated @ {{ as_datetime(state_attr('sensor.dad_joke', 'last_updated')).strftime('%H:%M %d %b %Y') }}*
-  *Source: {{ state_attr('sensor.dad_joke', 'source') }}*
+  *Last updated @ {{ as_datetime(state_attr('sensor.joke', 'last_updated')).strftime('%H:%M %d %b %Y') }}*
+  *Source: {{ state_attr('sensor.joke', 'source') }}*
 ```
 <img width="515" height="142" alt="image" src="https://github.com/user-attachments/assets/02296d98-f871-4a0f-93fe-df820ee80b16" />
 
@@ -109,11 +109,11 @@ content: |
 ```yaml
 type: markdown
 content: |
-  ## 😄 Dad Joke
-  {{ state_attr('sensor.dad_joke', 'joke') }}
+  ## 😄 Joke
+  {{ state_attr('sensor.joke', 'joke') }}
   
-  *Last updated: {{ relative_time(as_datetime(state_attr('sensor.dad_joke', 'last_updated'))) }} ago*
-  *Source: {{ state_attr('sensor.dad_joke', 'source') }}*
+  *Last updated: {{ relative_time(as_datetime(state_attr('sensor.joke', 'last_updated'))) }} ago*
+  *Source: {{ state_attr('sensor.joke', 'source') }}*
 ```
 <img width="518" height="147" alt="image" src="https://github.com/user-attachments/assets/076e83af-d8e4-43a6-bdd8-02635eb8f6cb" />
 
@@ -122,24 +122,24 @@ content: |
 ```yaml
 type: conditional
 conditions:
-  - entity: sensor.dad_joke
+  - entity: sensor.joke
     state: "OK"
 card:
   type: markdown
   content: |
-    ## 🎭 Today's Dad Joke
-    {{ state_attr('sensor.dad_joke', 'joke') }}
+    ## 🎭 Today's Joke
+    {{ state_attr('sensor.joke', 'joke') }}
     
-    **Joke ID**: {{ state_attr('sensor.dad_joke', 'joke_id') }}
-    **Source**: {{ state_attr('sensor.dad_joke', 'source') }}
-    **Updated**: {{ state_attr('sensor.dad_joke', 'last_updated') }}
+    **Joke ID**: {{ state_attr('sensor.joke', 'joke_id') }}
+    **Source**: {{ state_attr('sensor.joke', 'source') }}
+    **Updated**: {{ state_attr('sensor.joke', 'last_updated') }}
 ```
 
 #### Button Card Example (requires button-card from HACS)
 ```yaml
 type: custom:button-card
-entity: sensor.dad_joke
-name: Daily Dad Joke
+entity: sensor.joke
+name: Daily Joke
 show_state: false
 styles:
   card:
@@ -154,13 +154,13 @@ custom_fields:
   joke: |
     [[[
       return `<div style="font-size: 16px; line-height: 1.5; margin-top: 10px;">
-        ${states['sensor.dad_joke'].attributes.joke}
+        ${states['sensor.joke'].attributes.joke}
       </div>`
     ]]]
   source: |
     [[[
       return `<div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 10px;">
-        Source: ${states['sensor.dad_joke'].attributes.source}
+        Source: ${states['sensor.joke'].attributes.source}
       </div>`
     ]]]
 ```
@@ -168,18 +168,18 @@ custom_fields:
 #### Entities Card
 ```yaml
 type: entities
-title: Dad Joke
+title: Joke
 entities:
-  - entity: sensor.dad_joke
+  - entity: sensor.joke
     type: attribute
     attribute: joke
     name: Current Joke
-  - entity: sensor.dad_joke
+  - entity: sensor.joke
     type: attribute
     attribute: source
     name: Source
     icon: mdi:information-outline
-  - entity: sensor.dad_joke
+  - entity: sensor.joke
     type: attribute
     attribute: last_updated
     name: Last Updated
@@ -192,16 +192,16 @@ You can use the sensor in automations:
 
 ```yaml
 automation:
-  - alias: "Announce Dad Joke"
+  - alias: "Announce Joke"
     trigger:
       - platform: state
-        entity_id: sensor.dad_joke
+        entity_id: sensor.joke
         attribute: joke
     action:
       - service: notify.mobile_app_your_phone
         data:
-          title: "New Dad Joke!"
-          message: "{{ state_attr('sensor.dad_joke', 'joke') }}"
+          title: "New Joke!"
+          message: "{{ state_attr('sensor.joke', 'joke') }}"
 ```
 
 ## API Information
@@ -279,7 +279,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Credits
 
-- Dad jokes provided by:
+- Jokes provided by:
   - [icanhazdadjoke.com](https://icanhazdadjoke.com/)
   - [JokeAPI v2](https://v2.jokeapi.dev/) by Sven Fehler
   - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz

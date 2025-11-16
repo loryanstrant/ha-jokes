@@ -1,4 +1,4 @@
-# Dad Jokes Integration
+# Jokes Integration
 
 Bring some humor to your Home Assistant setup with random jokes from multiple sources!
 
@@ -29,7 +29,7 @@ This integration fetches random jokes from three different joke APIs and makes t
 
 ## Technical Details
 
-- **Entity**: `sensor.dad_joke` with state "OK" or "Error"
+- **Entity**: `sensor.joke` with state "OK" or "Error"
 - **Attributes**: `joke`, `joke_id`, `source`, `last_updated`, `refresh_interval`
 - **Icon**: 🙂 (mdi:emoticon-happy-outline)
 - **Updates**: Configurable interval from 1-1440 minutes
