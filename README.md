@@ -3,16 +3,18 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![GitHub release](https://img.shields.io/github/release/loryanstrant/ha-jokes.svg)](https://github.com/loryanstrant/ha-jokes/releases)
 
-A custom Home Assistant integration that fetches random dad jokes from [icanhazdadjoke.com](https://icanhazdadjoke.com/) and provides them as a sensor entity.
+A custom Home Assistant integration that fetches random dad jokes from multiple sources and provides them as a sensor entity.
 
 <p align="center"><img width="256" height="256" alt="icon" src="https://github.com/user-attachments/assets/ec238fee-508a-4647-9071-d93bf83a9988" /></p>
 
 
 ## Features
 
-- 🎭 Fetches random dad jokes from the icanhazdadjoke.com API
+- 🎭 Fetches random jokes from multiple joke APIs
+- 🔀 Random provider selection for variety
+- 🛡️ Fault tolerance - automatically tries alternative providers if one fails
 - 📊 Creates a sensor entity with state "OK" when successful
-- 🏷️ Stores joke text and ID as attributes (no 255 character state limitation)
+- 🏷️ Stores joke text, ID, and source as attributes (no 255 character state limitation)
 - ⏰ Configurable refresh interval (1-1440 minutes, default: 5 minutes)
 - ⚙️ Easy configuration through Home Assistant UI
 - 🔄 Supports options flow for changing settings
@@ -75,6 +77,7 @@ The sensor provides the following attributes:
 
 - `joke`: The complete joke text
 - `joke_id`: Unique identifier for the joke
+- `source`: The joke provider that supplied the joke
 - `last_updated`: Timestamp of the last successful update
 - `refresh_interval`: Current refresh interval in minutes
 
@@ -96,6 +99,7 @@ content: |
   {{ state_attr('sensor.dad_joke', 'joke') }}
   
   *Last updated @ {{ as_datetime(state_attr('sensor.dad_joke', 'last_updated')).strftime('%H:%M %d %b %Y') }}*
+  *Source: {{ state_attr('sensor.dad_joke', 'source') }}*
 ```
 <img width="515" height="142" alt="image" src="https://github.com/user-attachments/assets/02296d98-f871-4a0f-93fe-df820ee80b16" />
 
@@ -109,6 +113,7 @@ content: |
   {{ state_attr('sensor.dad_joke', 'joke') }}
   
   *Last updated: {{ relative_time(as_datetime(state_attr('sensor.dad_joke', 'last_updated'))) }} ago*
+  *Source: {{ state_attr('sensor.dad_joke', 'source') }}*
 ```
 <img width="518" height="147" alt="image" src="https://github.com/user-attachments/assets/076e83af-d8e4-43a6-bdd8-02635eb8f6cb" />
 
@@ -126,7 +131,59 @@ card:
     {{ state_attr('sensor.dad_joke', 'joke') }}
     
     **Joke ID**: {{ state_attr('sensor.dad_joke', 'joke_id') }}
+    **Source**: {{ state_attr('sensor.dad_joke', 'source') }}
     **Updated**: {{ state_attr('sensor.dad_joke', 'last_updated') }}
+```
+
+#### Button Card Example (requires button-card from HACS)
+```yaml
+type: custom:button-card
+entity: sensor.dad_joke
+name: Daily Dad Joke
+show_state: false
+styles:
+  card:
+    - background-color: var(--primary-background-color)
+    - padding: 20px
+    - border-radius: 15px
+  name:
+    - font-size: 20px
+    - font-weight: bold
+    - color: var(--primary-text-color)
+custom_fields:
+  joke: |
+    [[[
+      return `<div style="font-size: 16px; line-height: 1.5; margin-top: 10px;">
+        ${states['sensor.dad_joke'].attributes.joke}
+      </div>`
+    ]]]
+  source: |
+    [[[
+      return `<div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 10px;">
+        Source: ${states['sensor.dad_joke'].attributes.source}
+      </div>`
+    ]]]
+```
+
+#### Entities Card
+```yaml
+type: entities
+title: Dad Joke
+entities:
+  - entity: sensor.dad_joke
+    type: attribute
+    attribute: joke
+    name: Current Joke
+  - entity: sensor.dad_joke
+    type: attribute
+    attribute: source
+    name: Source
+    icon: mdi:information-outline
+  - entity: sensor.dad_joke
+    type: attribute
+    attribute: last_updated
+    name: Last Updated
+    icon: mdi:clock-outline
 ```
 
 ### Automations
@@ -149,13 +206,28 @@ automation:
 
 ## API Information
 
-This integration uses the [icanhazdadjoke.com](https://icanhazdadjoke.com/) API, which:
+This integration fetches jokes from three different sources, automatically selecting them in random order and providing fault tolerance if one source is unavailable:
 
-- Provides free access to dad jokes
-- Returns jokes in JSON format
-- Includes unique IDs for each joke
-- Has reasonable rate limits
-- Requires no API key
+### Joke Sources
+
+1. **[icanhazdadjoke.com](https://icanhazdadjoke.com/)** - A curated collection of dad jokes
+   - Provides free access to dad jokes
+   - Returns jokes in JSON format with unique IDs
+   - No API key required
+
+2. **[JokeAPI v2](https://v2.jokeapi.dev/)** - A RESTful API serving jokes
+   - Configured in safe mode (no explicit content)
+   - Returns single-line jokes only
+   - Free and open source
+   - No API key required
+
+3. **[Official Joke API](https://github.com/15Dkatz/official_joke_api)** - A simple joke API
+   - Community-maintained joke collection
+   - Returns setup/punchline format jokes
+   - Free and open source
+   - No API key required
+
+The integration randomly selects which provider to use for each joke request. If a provider fails to respond, it automatically tries the next provider, ensuring you always get a joke as long as at least one service is available.
 
 ## Troubleshooting
 
@@ -163,8 +235,9 @@ This integration uses the [icanhazdadjoke.com](https://icanhazdadjoke.com/) API,
 
 1. **Sensor shows "Error" state**
    - Check your internet connection
-   - Verify that icanhazdadjoke.com is accessible
+   - Verify that at least one joke API is accessible
    - Check Home Assistant logs for detailed error messages
+   - The integration will automatically try alternative providers
 
 2. **Integration not appearing**
    - Ensure you've restarted Home Assistant after installation
@@ -206,5 +279,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Credits
 
-- Dad jokes provided by [icanhazdadjoke.com](https://icanhazdadjoke.com/)
+- Dad jokes provided by:
+  - [icanhazdadjoke.com](https://icanhazdadjoke.com/)
+  - [JokeAPI v2](https://v2.jokeapi.dev/) by Sven Fehler
+  - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz
 - Integration developed for the Home Assistant community
