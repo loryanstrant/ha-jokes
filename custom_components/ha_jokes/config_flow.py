@@ -12,12 +12,17 @@ from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
 
 from .const import (
+    CONF_PROVIDERS,
     CONF_REFRESH_INTERVAL,
+    DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
     MAX_REFRESH_INTERVAL,
     MIN_REFRESH_INTERVAL,
     NAME,
+    PROVIDER_ICANHAZDADJOKE,
+    PROVIDER_JOKEAPI,
+    PROVIDER_OFFICIAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,12 +44,21 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             refresh_interval = user_input[CONF_REFRESH_INTERVAL]
             if not (MIN_REFRESH_INTERVAL <= refresh_interval <= MAX_REFRESH_INTERVAL):
                 errors[CONF_REFRESH_INTERVAL] = "invalid_refresh_interval"
-            else:
+            
+            # Validate providers - at least one must be selected
+            providers = user_input.get(CONF_PROVIDERS, [])
+            if not providers:
+                errors[CONF_PROVIDERS] = "no_providers_selected"
+            
+            if not errors:
                 # Create the config entry
                 return self.async_create_entry(
                     title=NAME,
                     data={},
-                    options={CONF_REFRESH_INTERVAL: refresh_interval},
+                    options={
+                        CONF_REFRESH_INTERVAL: refresh_interval,
+                        CONF_PROVIDERS: providers,
+                    },
                 )
 
         # Schema for the configuration form
@@ -53,6 +67,13 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(
                     CONF_REFRESH_INTERVAL, default=DEFAULT_REFRESH_INTERVAL
                 ): vol.All(cv.positive_int, vol.Range(min=MIN_REFRESH_INTERVAL, max=MAX_REFRESH_INTERVAL)),
+                vol.Required(
+                    CONF_PROVIDERS, default=DEFAULT_PROVIDERS
+                ): cv.multi_select({
+                    PROVIDER_ICANHAZDADJOKE: "icanhazdadjoke.com",
+                    PROVIDER_JOKEAPI: "JokeAPI (jokeapi.dev)",
+                    PROVIDER_OFFICIAL: "Official Joke API",
+                }),
             }
         )
 
@@ -90,12 +111,21 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
             refresh_interval = user_input[CONF_REFRESH_INTERVAL]
             if not (MIN_REFRESH_INTERVAL <= refresh_interval <= MAX_REFRESH_INTERVAL):
                 errors[CONF_REFRESH_INTERVAL] = "invalid_refresh_interval"
-            else:
+            
+            # Validate providers - at least one must be selected
+            providers = user_input.get(CONF_PROVIDERS, [])
+            if not providers:
+                errors[CONF_PROVIDERS] = "no_providers_selected"
+            
+            if not errors:
                 return self.async_create_entry(title="", data=user_input)
 
         # Get current options or defaults
         current_refresh_interval = self._config_entry.options.get(
             CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
+        )
+        current_providers = self._config_entry.options.get(
+            CONF_PROVIDERS, DEFAULT_PROVIDERS
         )
 
         # Schema for the options form
@@ -104,6 +134,13 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
                 vol.Required(
                     CONF_REFRESH_INTERVAL, default=current_refresh_interval
                 ): vol.All(cv.positive_int, vol.Range(min=MIN_REFRESH_INTERVAL, max=MAX_REFRESH_INTERVAL)),
+                vol.Required(
+                    CONF_PROVIDERS, default=current_providers
+                ): cv.multi_select({
+                    PROVIDER_ICANHAZDADJOKE: "icanhazdadjoke.com",
+                    PROVIDER_JOKEAPI: "JokeAPI (jokeapi.dev)",
+                    PROVIDER_OFFICIAL: "Official Joke API",
+                }),
             }
         )
 

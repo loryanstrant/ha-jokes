@@ -2,7 +2,7 @@
 
 DOMAIN = "ha_jokes"
 NAME = "Jokes"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 # API Configuration for icanhazdadjoke.com
 API_URL_ICANHAZDADJOKE = "https://icanhazdadjoke.com"
@@ -40,6 +40,7 @@ SENSOR_ICON = "mdi:emoticon-happy-outline"
 
 # Configuration Keys
 CONF_REFRESH_INTERVAL = "refresh_interval"
+CONF_PROVIDERS = "providers"
 
 # Attributes
 ATTR_JOKE = "joke"
@@ -47,6 +48,15 @@ ATTR_JOKE_ID = "joke_id"
 ATTR_LAST_UPDATED = "last_updated"
 ATTR_REFRESH_INTERVAL = "refresh_interval"
 ATTR_SOURCE = "source"
+ATTR_EXPLANATION = "explanation"
+
+# Provider names
+PROVIDER_ICANHAZDADJOKE = "icanhazdadjoke"
+PROVIDER_JOKEAPI = "jokeapi"
+PROVIDER_OFFICIAL = "official_joke_api"
+
+# Default providers (all enabled)
+DEFAULT_PROVIDERS = [PROVIDER_ICANHAZDADJOKE, PROVIDER_JOKEAPI, PROVIDER_OFFICIAL]
 
 # States
 STATE_OK = "OK"

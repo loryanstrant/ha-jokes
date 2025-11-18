@@ -1,0 +1,4 @@
+explain_joke:
+  name: Explain joke
+  description: Explains the current joke in simple terms using AI
+  fields: {}
