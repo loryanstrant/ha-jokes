@@ -27,14 +27,20 @@ from .const import (
     API_URL_ICANHAZDADJOKE,
     API_URL_JOKEAPI,
     API_URL_OFFICIAL,
+    ATTR_EXPLANATION,
     ATTR_JOKE,
     ATTR_JOKE_ID,
     ATTR_LAST_UPDATED,
     ATTR_REFRESH_INTERVAL,
     ATTR_SOURCE,
+    CONF_PROVIDERS,
     CONF_REFRESH_INTERVAL,
+    DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
+    PROVIDER_ICANHAZDADJOKE,
+    PROVIDER_JOKEAPI,
+    PROVIDER_OFFICIAL,
     SENSOR_ICON,
     SENSOR_NAME,
     STATE_ERROR,
@@ -53,38 +59,46 @@ async def async_setup_entry(
     # Get coordinator from hass.data
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     
-    async_add_entities([JokesSensor(coordinator, config_entry)], True)
+    # Create main joke sensor and explanation sensor
+    async_add_entities([
+        JokesSensor(coordinator, config_entry),
+        JokeExplanationSensor(coordinator, config_entry),
+    ], True)
 
 
 class JokesDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    def __init__(self, hass: HomeAssistant, refresh_interval: int) -> None:
+    def __init__(self, hass: HomeAssistant, refresh_interval: int, enabled_providers: list[str]) -> None:
         """Initialize."""
         self.platforms = []
         self._refresh_interval = refresh_interval
+        self._enabled_providers = enabled_providers if enabled_providers else DEFAULT_PROVIDERS
         
         # Define joke providers with their configurations
-        self._providers = [
+        all_providers = [
             {
-                "name": "icanhazdadjoke",
+                "name": PROVIDER_ICANHAZDADJOKE,
                 "url": API_URL_ICANHAZDADJOKE,
                 "headers": API_HEADERS_ICANHAZDADJOKE,
                 "parser": self._parse_icanhazdadjoke,
             },
             {
-                "name": "jokeapi",
+                "name": PROVIDER_JOKEAPI,
                 "url": API_URL_JOKEAPI,
                 "headers": API_HEADERS_JOKEAPI,
                 "parser": self._parse_jokeapi,
             },
             {
-                "name": "official_joke_api",
+                "name": PROVIDER_OFFICIAL,
                 "url": API_URL_OFFICIAL,
                 "headers": API_HEADERS_OFFICIAL,
                 "parser": self._parse_official_joke_api,
             },
         ]
+        
+        # Filter to only enabled providers
+        self._providers = [p for p in all_providers if p["name"] in self._enabled_providers]
         
         super().__init__(
             hass,
@@ -195,6 +209,34 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
         self._refresh_interval = refresh_interval
         self.update_interval = timedelta(minutes=refresh_interval)
 
+    def update_enabled_providers(self, enabled_providers: list[str]) -> None:
+        """Update the enabled providers."""
+        self._enabled_providers = enabled_providers if enabled_providers else DEFAULT_PROVIDERS
+        
+        # Rebuild providers list
+        all_providers = [
+            {
+                "name": PROVIDER_ICANHAZDADJOKE,
+                "url": API_URL_ICANHAZDADJOKE,
+                "headers": API_HEADERS_ICANHAZDADJOKE,
+                "parser": self._parse_icanhazdadjoke,
+            },
+            {
+                "name": PROVIDER_JOKEAPI,
+                "url": API_URL_JOKEAPI,
+                "headers": API_HEADERS_JOKEAPI,
+                "parser": self._parse_jokeapi,
+            },
+            {
+                "name": PROVIDER_OFFICIAL,
+                "url": API_URL_OFFICIAL,
+                "headers": API_HEADERS_OFFICIAL,
+                "parser": self._parse_official_joke_api,
+            },
+        ]
+        
+        self._providers = [p for p in all_providers if p["name"] in self._enabled_providers]
+
 
 class JokesSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Jokes sensor."""
@@ -246,5 +288,90 @@ class JokesSensor(CoordinatorEntity, SensorEntity):
         refresh_interval = config_entry.options.get(
             CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
         )
+        enabled_providers = config_entry.options.get(
+            CONF_PROVIDERS, DEFAULT_PROVIDERS
+        )
         self.coordinator.update_refresh_interval(refresh_interval)
+        self.coordinator.update_enabled_providers(enabled_providers)
         await self.coordinator.async_request_refresh()
+
+
+class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
+    """Representation of a Joke Explanation sensor."""
+
+    def __init__(
+        self,
+        coordinator: JokesDataUpdateCoordinator,
+        config_entry: ConfigEntry,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._attr_name = "Joke Explanation"
+        self._attr_icon = "mdi:comment-question-outline"
+        self._attr_unique_id = f"{DOMAIN}_{config_entry.entry_id}_explanation"
+        self._explanation = None
+
+    @property
+    def state(self) -> str:
+        """Return the state of the sensor."""
+        if self._explanation:
+            return "Available"
+        return "Unavailable"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return the state attributes."""
+        return {
+            ATTR_EXPLANATION: self._explanation or "No explanation available",
+        }
+
+    async def async_explain_joke(self) -> None:
+        """Explain the current joke using AI."""
+        if not self.coordinator.data:
+            _LOGGER.warning("No joke available to explain")
+            return
+        
+        joke = self.coordinator.data.get(ATTR_JOKE, "")
+        if not joke:
+            _LOGGER.warning("No joke text available to explain")
+            return
+        
+        try:
+            # Call the ai_task.generate_data service
+            response = await self.hass.services.async_call(
+                "ai_task",
+                "generate_data",
+                {
+                    "prompt": f"Explain this joke in simple terms: {joke}",
+                },
+                blocking=True,
+                return_response=True,
+            )
+            
+            if response:
+                self._explanation = response.get("text", "Unable to generate explanation")
+            else:
+                self._explanation = "No response from AI service"
+                
+            self.async_write_ha_state()
+            _LOGGER.debug("Joke explanation generated successfully")
+            
+        except Exception as err:
+            _LOGGER.error("Failed to generate joke explanation: %s", err)
+            self._explanation = f"Error: {str(err)}"
+            self.async_write_ha_state()
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to hass."""
+        await super().async_added_to_hass()
+        
+        # Listen for options updates
+        self._config_entry.async_on_unload(
+            self._config_entry.add_update_listener(self._async_update_options)
+        )
+
+    async def _async_update_options(self, config_entry: ConfigEntry) -> None:
+        """Update options."""
+        # Explanation sensor doesn't need to do anything on options update
+        pass

@@ -5,12 +5,14 @@
         "title": "Jokes Setup",
         "description": "Configure your Jokes integration",
         "data": {
-          "refresh_interval": "Refresh interval (minutes)"
+          "refresh_interval": "Refresh interval (minutes)",
+          "providers": "Joke providers"
         }
       }
     },
     "error": {
-      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes"
+      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes",
+      "no_providers_selected": "At least one joke provider must be selected"
     }
   },
   "options": {
@@ -19,12 +21,14 @@
         "title": "Jokes Options",
         "description": "Configure Jokes options",
         "data": {
-          "refresh_interval": "Refresh interval (minutes)"
+          "refresh_interval": "Refresh interval (minutes)",
+          "providers": "Joke providers"
         }
       }
     },
     "error": {
-      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes"
+      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes",
+      "no_providers_selected": "At least one joke provider must be selected"
     }
   }
 }
