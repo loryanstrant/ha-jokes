@@ -330,11 +330,22 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
         """Explain the current joke using AI."""
         if not self.coordinator.data:
             _LOGGER.warning("No joke available to explain")
+            self._explanation = "No joke available to explain"
+            self.async_write_ha_state()
             return
         
         joke = self.coordinator.data.get(ATTR_JOKE, "")
         if not joke:
             _LOGGER.warning("No joke text available to explain")
+            self._explanation = "No joke text available"
+            self.async_write_ha_state()
+            return
+        
+        # Check if ai_task service is available
+        if not self.hass.services.has_service("ai_task", "generate_data"):
+            _LOGGER.error("ai_task.generate_data service is not available. Please configure an AI provider.")
+            self._explanation = "AI service not configured. Please configure an AI provider in Home Assistant."
+            self.async_write_ha_state()
             return
         
         try:
@@ -365,6 +376,10 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
     async def async_added_to_hass(self) -> None:
         """When entity is added to hass."""
         await super().async_added_to_hass()
+        
+        # Store reference to this entity in hass.data for service calls
+        if DOMAIN in self.hass.data and self._config_entry.entry_id in self.hass.data[DOMAIN]:
+            self.hass.data[DOMAIN][self._config_entry.entry_id]["explanation_entity"] = self
         
         # Listen for options updates
         self._config_entry.async_on_unload(

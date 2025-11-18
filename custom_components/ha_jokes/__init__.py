@@ -46,6 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": coordinator,
         "data": entry.data,
+        "explanation_entity": None,  # Will be set by the sensor platform
     }
     
     # Set up platforms
@@ -54,30 +55,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register the explain_joke action
     async def handle_explain_joke(call):
         """Handle the explain_joke action."""
-        # Get the explanation sensor entity
-        entity_id = f"sensor.joke_explanation"
-        entity = hass.states.get(entity_id)
+        # Find the explanation sensor entity for any entry
+        explanation_entity = None
+        for entry_id, entry_data in hass.data[DOMAIN].items():
+            if isinstance(entry_data, dict) and "explanation_entity" in entry_data:
+                explanation_entity = entry_data["explanation_entity"]
+                if explanation_entity:
+                    break
         
-        if not entity:
-            _LOGGER.error("Joke Explanation entity not found")
+        if not explanation_entity:
+            _LOGGER.error("Joke Explanation entity not found or not yet initialized")
             return
         
-        # Find the explanation sensor entity object
-        for coordinator_data in hass.data[DOMAIN].values():
-            if isinstance(coordinator_data, dict) and "coordinator" in coordinator_data:
-                # Get the entity from entity registry or platform
-                # We need to trigger the explain method on the entity
-                pass
-        
-        # Get entity from component
-        component = hass.data.get("entity_components", {}).get("sensor")
-        if component:
-            for entity_obj in component.entities:
-                if hasattr(entity_obj, "unique_id") and entity_obj.unique_id == f"{DOMAIN}_{entry.entry_id}_explanation":
-                    await entity_obj.async_explain_joke()
-                    return
-        
-        _LOGGER.error("Could not find explanation sensor entity object")
+        await explanation_entity.async_explain_joke()
     
     hass.services.async_register(DOMAIN, "explain_joke", handle_explain_joke)
     
