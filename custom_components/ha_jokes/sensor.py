@@ -308,6 +308,7 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
 
     async def async_explain_joke(self) -> None:
         """Explain the current joke using AI."""
+        _LOGGER.info("=== Starting explain_joke service ===")
         # Find the joke sensor entity dynamically
         joke = None
         joke_entity_id = None
@@ -344,7 +345,8 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
         
         try:
             # Call the ai_task.generate_data service with correct parameters
-            _LOGGER.debug("Calling ai_task.generate_data for joke from %s", joke_entity_id)
+            _LOGGER.info("Calling ai_task.generate_data for joke from %s", joke_entity_id)
+            _LOGGER.info("Joke to explain: %s", joke[:100])
             response = await self.hass.services.async_call(
                 "ai_task",
                 "generate_data",
@@ -356,8 +358,15 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
                 return_response=True,
             )
             
+            _LOGGER.info("AI service response: %s", response)
+            _LOGGER.info("Response type: %s", type(response))
+            
             if response:
-                self._explanation = response.get("text", "Unable to generate explanation")
+                # The azure_ai_tasks service returns a dict with 'data' key containing the text
+                if isinstance(response, dict):
+                    self._explanation = response.get("data", "Unable to generate explanation")
+                else:
+                    self._explanation = str(response)
             else:
                 self._explanation = "No response from AI service"
                 
