@@ -16,6 +16,7 @@ A custom Home Assistant integration that fetches random jokes from multiple sour
 - 📊 Creates a sensor entity with state "OK" when successful
 - 🏷️ Stores joke text, ID, and source as attributes (no 255 character state limitation)
 - ⏰ Configurable refresh interval (1-1440 minutes, default: 5 minutes)
+- 🤖 AI-powered joke explanations using Home Assistant's AI integration
 - ⚙️ Easy configuration through Home Assistant UI
 - 🔄 Supports options flow for changing settings
 - 🛡️ Robust error handling and logging
@@ -202,6 +203,84 @@ automation:
         data:
           title: "New Joke!"
           message: "{{ state_attr('sensor.joke', 'joke') }}"
+```
+
+### AI-Powered Joke Explanations
+
+The integration provides an `ha_jokes.explain_joke` service that uses Home Assistant's AI integration to explain the current joke in plain language. This is perfect for jokes that might have wordplay, cultural references, or puns that need clarification.
+
+#### Requirements
+- Home Assistant AI integration must be configured (e.g., OpenAI, Google Generative AI, or Azure AI)
+- A default AI conversation agent must be set up
+
+#### Usage
+
+**From the Developer Tools:**
+1. Go to **Developer Tools** → **Actions**
+2. Select the `ha_jokes.explain_joke` action
+3. Click **"Perform Action"**
+
+**In Automations:**
+```yaml
+automation:
+  - alias: "Explain Joke on Request"
+    trigger:
+      - platform: state
+        entity_id: input_boolean.explain_joke_trigger
+        to: "on"
+    action:
+      - service: ha_jokes.explain_joke
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Joke Explanation"
+          message: "{{ state_attr('sensor.joke_explanation', 'explanation') }}"
+```
+
+**In Scripts:**
+```yaml
+script:
+  get_joke_explanation:
+    sequence:
+      - service: ha_jokes.explain_joke
+      - delay:
+          seconds: 5
+      - service: notify.persistent_notification
+        data:
+          title: "Joke Explanation"
+          message: "{{ state_attr('sensor.joke_explanation', 'explanation') }}"
+```
+
+#### Explanation Sensor
+
+After calling the `explain_joke` service, the explanation is stored in the `sensor.joke_explanation` entity:
+
+- **Entity ID**: `sensor.joke_explanation`
+- **State**: "Explained" when an explanation is available, "Not Explained" otherwise
+- **Attribute**: `explanation` contains the AI-generated explanation
+
+**Example Lovelace Card:**
+```yaml
+type: vertical-stack
+cards:
+  - type: markdown
+    content: |
+      ## 😄 Joke
+      {{ state_attr('sensor.joke', 'joke') }}
+  - type: button
+    name: Explain This Joke
+    icon: mdi:comment-question-outline
+    tap_action:
+      action: call-service
+      service: ha_jokes.explain_joke
+  - type: conditional
+    conditions:
+      - entity: sensor.joke_explanation
+        state: "Explained"
+    card:
+      type: markdown
+      content: |
+        ### 💡 Explanation
+        {{ state_attr('sensor.joke_explanation', 'explanation') }}
 ```
 
 ## API Information

@@ -52,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     
-    # Register the explain_joke action
+    # Register the explain_joke action (only once)
     async def handle_explain_joke(call):
         """Handle the explain_joke action."""
         # Find the explanation sensor entity for any entry
@@ -69,7 +69,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         
         await explanation_entity.async_explain_joke()
     
-    hass.services.async_register(DOMAIN, "explain_joke", handle_explain_joke)
+    # Only register the service if it hasn't been registered yet
+    if not hass.services.has_service(DOMAIN, "explain_joke"):
+        hass.services.async_register(DOMAIN, "explain_joke", handle_explain_joke)
     
     # Set up options update listener
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
