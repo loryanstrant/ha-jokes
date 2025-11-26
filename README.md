@@ -62,7 +62,11 @@ Or open it directly from here:
 2. Find the **Jokes** integration
 3. Click **"Configure"**
 4. Adjust the refresh interval as needed
-5. Click **"Submit"**
+5. Select/de-select joke providers
+6. Click **"Submit"**
+
+<img width="382" height="413" alt="image" src="https://github.com/user-attachments/assets/8ea33209-7f50-4fe2-b734-877f8f8449b4" />
+
 
 ## Usage
 
@@ -208,6 +212,9 @@ automation:
 ### AI-Powered Joke Explanations
 
 The integration provides an `ha_jokes.explain_joke` service that uses Home Assistant's AI integration to explain the current joke in plain language. This is perfect for jokes that might have wordplay, cultural references, or puns that need clarification.
+
+<img width="1410" height="536" alt="image" src="https://github.com/user-attachments/assets/90830e78-ccc3-4fe2-8a79-8e862155dc39" />
+
 
 #### Requirements
 - Home Assistant AI integration must be configured (e.g., OpenAI, Google Generative AI, or Azure AI)
