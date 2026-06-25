@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta
 import logging
 import random
+import textwrap
+from datetime import datetime, timedelta
 from typing import Any
 
 import aiohttp
@@ -12,6 +13,7 @@ import async_timeout
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import MAX_LENGTH_STATE_STATE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
@@ -108,6 +110,21 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=refresh_interval),
         )
 
+    def _fix_joke_text(self, joke_text: str | None) -> str:
+        """Ensure that joke meets all requirements for Home Assistant state value.
+        
+        e.g. https://www.home-assistant.io/docs/templating/states/#states-have-a-255-character-limit
+        """
+        if not joke_text:
+            return ""
+        
+        # See homeassistant.core.validate_state
+        if len(joke_text) <= MAX_LENGTH_STATE_STATE:
+            return joke_text
+
+        # Use smart collapse and truncate
+        return textwrap.shorten(joke_text, width=MAX_LENGTH_STATE_STATE, placeholder="...")
+
     def _parse_icanhazdadjoke(self, data: dict) -> dict[str, Any]:
         """Parse icanhazdadjoke.com response."""
         return {
@@ -186,6 +203,8 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
                     for provider in providers:
                         result = await self._fetch_from_provider(session, provider)
                         if result:
+                            # Enforce constraints
+                            result[ATTR_JOKE] = self._fix_joke_text(result[ATTR_JOKE])
                             # Add common attributes
                             result[ATTR_LAST_UPDATED] = datetime.now().isoformat()
                             result[ATTR_REFRESH_INTERVAL] = self._refresh_interval
