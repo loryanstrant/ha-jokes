@@ -1,7 +1,13 @@
 # Home Assistant Jokes Integration
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release](https://img.shields.io/github/release/loryanstrant/ha-jokes.svg)](https://github.com/loryanstrant/ha-jokes/releases)
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5?style=flat-square)](https://github.com/hacs/integration)
+[![Release](https://img.shields.io/github/v/release/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
+[![Release date](https://img.shields.io/github/release-date/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
+[![Downloads](https://img.shields.io/github/downloads/loryanstrant/ha-jokes/total?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
+[![Last commit](https://img.shields.io/github/last-commit/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/commits)
+[![Stars](https://img.shields.io/github/stars/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/stargazers)
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=loryanstrant&repository=ha-jokes&category=integration)
 
 A custom Home Assistant integration that fetches random jokes from multiple sources and provides them as a sensor entity.
 
