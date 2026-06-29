@@ -4,6 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
 [![Release date](https://img.shields.io/github/release-date/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
 [![Downloads](https://img.shields.io/github/downloads/loryanstrant/ha-jokes/total?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
+[![License](https://img.shields.io/github/license/loryanstrant/ha-jokes?style=flat-square)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/commits)
 [![Stars](https://img.shields.io/github/stars/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/stargazers)
 
