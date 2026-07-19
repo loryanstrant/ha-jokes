@@ -7,6 +7,9 @@
         "data": {
           "refresh_interval": "Refresh interval (minutes)",
           "providers": "Joke providers"
+        },
+        "data_description": {
+          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default."
         }
       }
     },
@@ -23,6 +26,9 @@
         "data": {
           "refresh_interval": "Refresh interval (minutes)",
           "providers": "Joke providers"
+        },
+        "data_description": {
+          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default."
         }
       }
     },

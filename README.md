@@ -297,9 +297,74 @@ cards:
         {{ state_attr('sensor.joke_explanation', 'explanation') }}
 ```
 
+### Polished all-in-one card (recommended)
+
+A single, tidy card that shows the joke in a styled quote, an **Explain it** button, a
+**New joke** button (fetches a fresh joke on demand), and a conditional explanation
+panel that only appears once an explanation has been generated. It uses **only built-in
+Home Assistant cards** — no HACS front-end cards required — so it works on any install.
+
+The full YAML (plus an optional [Mushroom](https://github.com/piitaya/lovelace-mushroom)
+variant for a slicker look) lives in [`examples/joke-cards.yaml`](examples/joke-cards.yaml).
+Copy the built-in block into your dashboard:
+
+```yaml
+type: vertical-stack
+cards:
+  - type: markdown
+    content: >
+      # 😄 Joke of the Moment
+
+      {% if is_state('sensor.joke', 'OK') and state_attr('sensor.joke', 'joke') %}
+
+      > {{ state_attr('sensor.joke', 'joke') }}
+
+
+      <small>🎲 {{ state_attr('sensor.joke', 'source') }} &nbsp;·&nbsp; 🕒 {{
+      relative_time(as_datetime(state_attr('sensor.joke', 'last_updated'))) }} ago</small>
+
+      {% else %}
+
+      _No joke right now — hang tight, the next one is on its way…_
+
+      {% endif %}
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: Explain it
+        icon: mdi:lightbulb-question-outline
+        icon_height: 28px
+        tap_action:
+          action: perform-action
+          perform_action: ha_jokes.explain_joke
+      - type: button
+        name: New joke
+        icon: mdi:dice-multiple-outline
+        icon_height: 28px
+        tap_action:
+          action: perform-action
+          perform_action: homeassistant.update_entity
+          target:
+            entity_id: sensor.joke
+  - type: conditional
+    conditions:
+      - entity: sensor.joke_explanation
+        state: Explained
+    card:
+      type: markdown
+      content: >
+        ### 💡 Explanation
+
+        {{ state_attr('sensor.joke_explanation', 'explanation') }}
+```
+
+> The **New joke** button calls `homeassistant.update_entity` on `sensor.joke`, which
+> triggers an immediate refresh from a random provider. The `perform-action` / `perform_action`
+> keys are the current Home Assistant syntax; on older cores use `call-service` / `service`.
+
 ## API Information
 
-This integration fetches jokes from three different sources, automatically selecting them in random order and providing fault tolerance if one source is unavailable:
+This integration fetches jokes from several different sources, automatically selecting them in random order and providing fault tolerance if one source is unavailable:
 
 ### Joke Sources
 
@@ -319,6 +384,16 @@ This integration fetches jokes from three different sources, automatically selec
    - Returns setup/punchline format jokes
    - Free and open source
    - No API key required
+
+4. **[Geek Jokes](https://github.com/sameerkumar18/geek-joke-api)** - Random one-liners
+   - ⚠️ **Not family-friendly** — despite the name, the feed is mostly Chuck Norris jokes with some crude/edgy content and no safe-mode filter. **Disabled by default**; opt in via the integration options
+   - Returns single-line jokes
+   - Free, no API key required
+
+5. **[Yo Mama Jokes](https://www.yomama-jokes.com/)** - Roast-style "yo mama" jokes
+   - ⚠️ **Not family-friendly** (adult/roast humour) — **disabled by default**; opt in via the integration options
+   - Returns single-line jokes
+   - Free, no API key required
 
 The integration randomly selects which provider to use for each joke request. If a provider fails to respond, it automatically tries the next provider, ensuring you always get a joke as long as at least one service is available.
 
@@ -376,4 +451,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - [icanhazdadjoke.com](https://icanhazdadjoke.com/)
   - [JokeAPI v2](https://v2.jokeapi.dev/) by Sven Fehler
   - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz
+  - [Geek Jokes](https://github.com/sameerkumar18/geek-joke-api) by Sameer Kumar (unfiltered, opt-in)
+  - [Yo Mama Jokes](https://www.yomama-jokes.com/) (adult/roast humour, opt-in)
 - Integration developed for the Home Assistant community

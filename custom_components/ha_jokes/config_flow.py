@@ -20,9 +20,11 @@ from .const import (
     MAX_REFRESH_INTERVAL,
     MIN_REFRESH_INTERVAL,
     NAME,
+    PROVIDER_GEEKJOKES,
     PROVIDER_ICANHAZDADJOKE,
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
+    PROVIDER_YOMAMA,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -73,6 +75,8 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     PROVIDER_ICANHAZDADJOKE: "icanhazdadjoke.com",
                     PROVIDER_JOKEAPI: "JokeAPI (jokeapi.dev)",
                     PROVIDER_OFFICIAL: "Official Joke API",
+                    PROVIDER_GEEKJOKES: "Geek Jokes (⚠️ not family-friendly)",
+                    PROVIDER_YOMAMA: "Yo Mama Jokes (⚠️ not family-friendly)",
                 }),
             }
         )
@@ -140,6 +144,8 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
                     PROVIDER_ICANHAZDADJOKE: "icanhazdadjoke.com",
                     PROVIDER_JOKEAPI: "JokeAPI (jokeapi.dev)",
                     PROVIDER_OFFICIAL: "Official Joke API",
+                    PROVIDER_GEEKJOKES: "Geek Jokes (⚠️ not family-friendly)",
+                    PROVIDER_YOMAMA: "Yo Mama Jokes (⚠️ not family-friendly)",
                 }),
             }
         )
