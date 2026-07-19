@@ -297,9 +297,44 @@ cards:
         {{ state_attr('sensor.joke_explanation', 'explanation') }}
 ```
 
+### Jokes Card (recommended)
+
+The integration **ships its own Lovelace card**, `custom:ha-jokes-card`. It is bundled
+with the integration and **auto-registered** — there is nothing to install in HACS and
+no Lovelace resource to add by hand. After a restart, add a card to your dashboard, pick
+**"Jokes Card"** from the card picker (or paste the YAML below).
+
+The card shows the current joke in a styled quote, its source and how long ago it
+updated, an **Explain it** button (triggers an AI explanation via `ha_jokes.explain_joke`),
+a **New joke** button (fetches a fresh joke on demand), and a conditional explanation
+panel that appears once an explanation has been generated. It uses your active theme's
+colours, so it looks right in both light and dark mode.
+
+```yaml
+type: custom:ha-jokes-card
+# all options below are optional — these are the defaults
+entity: sensor.joke
+explanation_entity: sensor.joke_explanation
+title: Joke of the Moment
+show_source: true
+show_buttons: true
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `entity` | `sensor.joke` | The joke sensor to display. |
+| `explanation_entity` | `sensor.joke_explanation` | Sensor holding the AI explanation. |
+| `title` | `Joke of the Moment` | Card heading. |
+| `show_source` | `true` | Show the source/provider line. |
+| `show_buttons` | `true` | Show the **Explain it** / **New joke** buttons. |
+
+> If you'd rather not use the custom card, a **built-in-cards-only** alternative (plus an
+> optional [Mushroom](https://github.com/piitaya/lovelace-mushroom) variant) lives in
+> [`examples/joke-cards.yaml`](examples/joke-cards.yaml) — it works with core cards only.
+
 ## API Information
 
-This integration fetches jokes from three different sources, automatically selecting them in random order and providing fault tolerance if one source is unavailable:
+This integration fetches jokes from several different sources, automatically selecting them in random order and providing fault tolerance if one source is unavailable:
 
 ### Joke Sources
 
@@ -319,6 +354,16 @@ This integration fetches jokes from three different sources, automatically selec
    - Returns setup/punchline format jokes
    - Free and open source
    - No API key required
+
+4. **[Geek Jokes](https://github.com/sameerkumar18/geek-joke-api)** - Random one-liners
+   - ⚠️ **Not family-friendly** — despite the name, the feed is mostly Chuck Norris jokes with some crude/edgy content and no safe-mode filter. **Disabled by default**; opt in via the integration options
+   - Returns single-line jokes
+   - Free, no API key required
+
+5. **[Yo Mama Jokes](https://www.yomama-jokes.com/)** - Roast-style "yo mama" jokes
+   - ⚠️ **Not family-friendly** (adult/roast humour) — **disabled by default**; opt in via the integration options
+   - Returns single-line jokes
+   - Free, no API key required
 
 The integration randomly selects which provider to use for each joke request. If a provider fails to respond, it automatically tries the next provider, ensuring you always get a joke as long as at least one service is available.
 
@@ -376,4 +421,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - [icanhazdadjoke.com](https://icanhazdadjoke.com/)
   - [JokeAPI v2](https://v2.jokeapi.dev/) by Sven Fehler
   - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz
+  - [Geek Jokes](https://github.com/sameerkumar18/geek-joke-api) by Sameer Kumar (unfiltered, opt-in)
+  - [Yo Mama Jokes](https://www.yomama-jokes.com/) (adult/roast humour, opt-in)
 - Integration developed for the Home Assistant community

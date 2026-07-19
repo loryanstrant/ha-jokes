@@ -21,12 +21,16 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import (
+    API_HEADERS_GEEKJOKES,
     API_HEADERS_ICANHAZDADJOKE,
     API_HEADERS_JOKEAPI,
     API_HEADERS_OFFICIAL,
+    API_HEADERS_YOMAMA,
+    API_URL_GEEKJOKES,
     API_URL_ICANHAZDADJOKE,
     API_URL_JOKEAPI,
     API_URL_OFFICIAL,
+    API_URL_YOMAMA,
     ATTR_EXPLANATION,
     ATTR_JOKE,
     ATTR_JOKE_ID,
@@ -38,9 +42,11 @@ from .const import (
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
+    PROVIDER_GEEKJOKES,
     PROVIDER_ICANHAZDADJOKE,
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
+    PROVIDER_YOMAMA,
     SENSOR_ICON,
     SENSOR_NAME,
     STATE_ERROR,
@@ -89,6 +95,18 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
                 "url": API_URL_OFFICIAL,
                 "headers": API_HEADERS_OFFICIAL,
                 "parser": self._parse_official_joke_api,
+            },
+            {
+                "name": PROVIDER_GEEKJOKES,
+                "url": API_URL_GEEKJOKES,
+                "headers": API_HEADERS_GEEKJOKES,
+                "parser": self._parse_geekjokes,
+            },
+            {
+                "name": PROVIDER_YOMAMA,
+                "url": API_URL_YOMAMA,
+                "headers": API_HEADERS_YOMAMA,
+                "parser": self._parse_yomama,
             },
         ]
 
@@ -141,6 +159,24 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             ATTR_JOKE: joke_text,
             ATTR_JOKE_ID: joke_id,
             ATTR_SOURCE: "official-joke-api.appspot.com",
+        }
+
+    def _parse_geekjokes(self, data: dict) -> dict[str, Any]:
+        """Parse Geek Jokes response."""
+        # Geek Jokes returns a single 'joke' field and no id
+        return {
+            ATTR_JOKE: data.get("joke", ""),
+            ATTR_JOKE_ID: "",
+            ATTR_SOURCE: "geek-jokes.sameerkumar.website",
+        }
+
+    def _parse_yomama(self, data: dict) -> dict[str, Any]:
+        """Parse Yo Mama Jokes response (adult/roast humour)."""
+        # Yo Mama returns a 'joke' field (plus a 'category') and no id
+        return {
+            ATTR_JOKE: data.get("joke", ""),
+            ATTR_JOKE_ID: "",
+            ATTR_SOURCE: "yomama-jokes.com",
         }
 
     async def _fetch_from_provider(

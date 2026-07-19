@@ -1,0 +1,124 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Polished dashboard cards for the ha-jokes integration
+#
+# Two ready-to-paste designs:
+#   1. Built-in card  — uses only core Home Assistant cards. No HACS needed.
+#                       Works on every install. Recommended default.
+#   2. Mushroom card  — a slicker look for users who have the Mushroom and
+#                       card-mod front-end cards installed via HACS.
+#
+# Entities used:
+#   sensor.joke              — state "OK"/"Error"; attributes joke, source, last_updated
+#   sensor.joke_explanation  — state "Explained"/"Not Explained"; attribute explanation
+# Service used:
+#   ha_jokes.explain_joke    — generates an AI explanation of the current joke
+#
+# To swap the joke for a fresh one on demand, we call homeassistant.update_entity
+# on sensor.joke, which triggers an immediate refresh from a random provider.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# 1. BUILT-IN CARD (no custom cards required) — recommended
+# ═════════════════════════════════════════════════════════════════════════════
+type: vertical-stack
+cards:
+  - type: markdown
+    content: >
+      # 😄 Joke of the Moment
+
+      {% if is_state('sensor.joke', 'OK') and state_attr('sensor.joke', 'joke') %}
+
+      > {{ state_attr('sensor.joke', 'joke') }}
+
+
+      <small>🎲 {{ state_attr('sensor.joke', 'source') }} &nbsp;·&nbsp; 🕒 {{
+      relative_time(as_datetime(state_attr('sensor.joke', 'last_updated'))) }} ago</small>
+
+      {% else %}
+
+      _No joke right now — hang tight, the next one is on its way…_
+
+      {% endif %}
+
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: Explain it
+        icon: mdi:lightbulb-question-outline
+        icon_height: 28px
+        tap_action:
+          action: perform-action
+          perform_action: ha_jokes.explain_joke
+      - type: button
+        name: New joke
+        icon: mdi:dice-multiple-outline
+        icon_height: 28px
+        tap_action:
+          action: perform-action
+          perform_action: homeassistant.update_entity
+          target:
+            entity_id: sensor.joke
+
+  - type: conditional
+    conditions:
+      - entity: sensor.joke_explanation
+        state: Explained
+    card:
+      type: markdown
+      content: >
+        ### 💡 Explanation
+
+        {{ state_attr('sensor.joke_explanation', 'explanation') }}
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# 2. MUSHROOM CARD (requires the "Mushroom" and "card-mod" cards from HACS)
+#    Paste this instead of the block above for a more compact, styled look.
+# ═════════════════════════════════════════════════════════════════════════════
+# type: vertical-stack
+# cards:
+#   - type: custom:mushroom-template-card
+#     primary: Joke of the Moment
+#     secondary: >-
+#       {% if is_state('sensor.joke', 'OK') and state_attr('sensor.joke', 'joke') %}
+#         {{ state_attr('sensor.joke', 'joke') }}
+#       {% else %}
+#         No joke right now — the next one is on its way…
+#       {% endif %}
+#     icon: mdi:emoticon-happy-outline
+#     icon_color: amber
+#     multiline_secondary: true
+#     card_mod:
+#       style: |
+#         ha-card { --card-primary-font-size: 18px; }
+#         ha-card .secondary { font-size: 15px; line-height: 1.5; white-space: normal; }
+#   - type: horizontal-stack
+#     cards:
+#       - type: custom:mushroom-template-card
+#         primary: Explain it
+#         icon: mdi:lightbulb-question-outline
+#         icon_color: blue
+#         tap_action:
+#           action: perform-action
+#           perform_action: ha_jokes.explain_joke
+#       - type: custom:mushroom-template-card
+#         primary: New joke
+#         icon: mdi:dice-multiple-outline
+#         icon_color: green
+#         tap_action:
+#           action: perform-action
+#           perform_action: homeassistant.update_entity
+#           target:
+#             entity_id: sensor.joke
+#   - type: conditional
+#     conditions:
+#       - entity: sensor.joke_explanation
+#         state: Explained
+#     card:
+#       type: custom:mushroom-template-card
+#       primary: Explanation
+#       secondary: "{{ state_attr('sensor.joke_explanation', 'explanation') }}"
+#       icon: mdi:lightbulb-on-outline
+#       icon_color: yellow
+#       multiline_secondary: true

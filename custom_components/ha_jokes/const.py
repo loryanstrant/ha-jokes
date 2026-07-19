@@ -2,7 +2,7 @@
 
 DOMAIN = "ha_jokes"
 NAME = "Jokes"
-VERSION = "1.3.1"
+VERSION = "1.4.0"
 
 # API Configuration for icanhazdadjoke.com
 API_URL_ICANHAZDADJOKE = "https://icanhazdadjoke.com"
@@ -21,6 +21,21 @@ API_HEADERS_JOKEAPI = {
 # API Configuration for Official Joke API
 API_URL_OFFICIAL = "https://official-joke-api.appspot.com/random_joke"
 API_HEADERS_OFFICIAL = {
+    "Accept": "application/json",
+    "User-Agent": "Home Assistant Jokes Integration",
+}
+
+# API Configuration for Geek Jokes (unfiltered — largely Chuck Norris + crude material;
+# not family-friendly, so it is opt-in rather than a default provider)
+API_URL_GEEKJOKES = "https://geek-jokes.sameerkumar.website/api?format=json"
+API_HEADERS_GEEKJOKES = {
+    "Accept": "application/json",
+    "User-Agent": "Home Assistant Jokes Integration",
+}
+
+# API Configuration for Yo Mama Jokes (adult/roast humour — not family-friendly)
+API_URL_YOMAMA = "https://www.yomama-jokes.com/api/v1/jokes/random/"
+API_HEADERS_YOMAMA = {
     "Accept": "application/json",
     "User-Agent": "Home Assistant Jokes Integration",
 }
@@ -54,9 +69,18 @@ ATTR_EXPLANATION = "explanation"
 PROVIDER_ICANHAZDADJOKE = "icanhazdadjoke"
 PROVIDER_JOKEAPI = "jokeapi"
 PROVIDER_OFFICIAL = "official_joke_api"
+PROVIDER_GEEKJOKES = "geek_jokes"
+PROVIDER_YOMAMA = "yomama_jokes"
 
-# Default providers (all enabled)
-DEFAULT_PROVIDERS = [PROVIDER_ICANHAZDADJOKE, PROVIDER_JOKEAPI, PROVIDER_OFFICIAL]
+# Default providers (family-friendly sources enabled by default).
+# PROVIDER_GEEKJOKES and PROVIDER_YOMAMA are intentionally excluded — both serve
+# unfiltered adult/edgy content (Geek Jokes is largely Chuck Norris + crude material;
+# Yo Mama is roast humour) and must be opted into explicitly.
+DEFAULT_PROVIDERS = [
+    PROVIDER_ICANHAZDADJOKE,
+    PROVIDER_JOKEAPI,
+    PROVIDER_OFFICIAL,
+]
 
 # States
 STATE_OK = "OK"
