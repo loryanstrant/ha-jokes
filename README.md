@@ -17,7 +17,7 @@ A custom Home Assistant integration that fetches random jokes from multiple sour
 
 ## Features
 
-- 🎭 Fetches random jokes from multiple joke APIs
+- 🎭 Fetches random jokes from **5 built-in sources** — 3 family-friendly (on by default) plus 2 opt-in sources clearly marked **⚠️ not family-friendly**
 - 🔀 Random provider selection for variety
 - 🛡️ Fault tolerance - automatically tries alternative providers if one fails
 - 📊 Creates a sensor entity with state "OK" when successful
@@ -72,7 +72,10 @@ Or open it directly from here:
 5. Select/de-select joke providers
 6. Click **"Submit"**
 
-<img width="382" height="413" alt="image" src="https://github.com/user-attachments/assets/8ea33209-7f50-4fe2-b734-877f8f8449b4" />
+The setup and options screens list every joke source. The two opt-in sources are labelled
+**⚠️ not family-friendly** and are unchecked by default:
+
+<img alt="Jokes setup dialog — choosing joke providers, with Geek Jokes and Yo Mama marked not family-friendly and off by default" src="images/config-flow.png" width="640" />
 
 
 ## Usage
@@ -309,6 +312,8 @@ updated, an **Explain it** button (triggers an AI explanation via `ha_jokes.expl
 a **New joke** button (fetches a fresh joke on demand), and a conditional explanation
 panel that appears once an explanation has been generated. It uses your active theme's
 colours, so it looks right in both light and dark mode.
+
+<img alt="custom:ha-jokes-card showing a joke, its source, Explain it and New joke buttons, and an explanation panel" src="images/card.png" width="420" />
 
 ```yaml
 type: custom:ha-jokes-card
