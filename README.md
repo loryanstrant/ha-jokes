@@ -297,70 +297,40 @@ cards:
         {{ state_attr('sensor.joke_explanation', 'explanation') }}
 ```
 
-### Polished all-in-one card (recommended)
+### Jokes Card (recommended)
 
-A single, tidy card that shows the joke in a styled quote, an **Explain it** button, a
-**New joke** button (fetches a fresh joke on demand), and a conditional explanation
-panel that only appears once an explanation has been generated. It uses **only built-in
-Home Assistant cards** — no HACS front-end cards required — so it works on any install.
+The integration **ships its own Lovelace card**, `custom:ha-jokes-card`. It is bundled
+with the integration and **auto-registered** — there is nothing to install in HACS and
+no Lovelace resource to add by hand. After a restart, add a card to your dashboard, pick
+**"Jokes Card"** from the card picker (or paste the YAML below).
 
-The full YAML (plus an optional [Mushroom](https://github.com/piitaya/lovelace-mushroom)
-variant for a slicker look) lives in [`examples/joke-cards.yaml`](examples/joke-cards.yaml).
-Copy the built-in block into your dashboard:
+The card shows the current joke in a styled quote, its source and how long ago it
+updated, an **Explain it** button (triggers an AI explanation via `ha_jokes.explain_joke`),
+a **New joke** button (fetches a fresh joke on demand), and a conditional explanation
+panel that appears once an explanation has been generated. It uses your active theme's
+colours, so it looks right in both light and dark mode.
 
 ```yaml
-type: vertical-stack
-cards:
-  - type: markdown
-    content: >
-      # 😄 Joke of the Moment
-
-      {% if is_state('sensor.joke', 'OK') and state_attr('sensor.joke', 'joke') %}
-
-      > {{ state_attr('sensor.joke', 'joke') }}
-
-
-      <small>🎲 {{ state_attr('sensor.joke', 'source') }} &nbsp;·&nbsp; 🕒 {{
-      relative_time(as_datetime(state_attr('sensor.joke', 'last_updated'))) }} ago</small>
-
-      {% else %}
-
-      _No joke right now — hang tight, the next one is on its way…_
-
-      {% endif %}
-  - type: horizontal-stack
-    cards:
-      - type: button
-        name: Explain it
-        icon: mdi:lightbulb-question-outline
-        icon_height: 28px
-        tap_action:
-          action: perform-action
-          perform_action: ha_jokes.explain_joke
-      - type: button
-        name: New joke
-        icon: mdi:dice-multiple-outline
-        icon_height: 28px
-        tap_action:
-          action: perform-action
-          perform_action: homeassistant.update_entity
-          target:
-            entity_id: sensor.joke
-  - type: conditional
-    conditions:
-      - entity: sensor.joke_explanation
-        state: Explained
-    card:
-      type: markdown
-      content: >
-        ### 💡 Explanation
-
-        {{ state_attr('sensor.joke_explanation', 'explanation') }}
+type: custom:ha-jokes-card
+# all options below are optional — these are the defaults
+entity: sensor.joke
+explanation_entity: sensor.joke_explanation
+title: Joke of the Moment
+show_source: true
+show_buttons: true
 ```
 
-> The **New joke** button calls `homeassistant.update_entity` on `sensor.joke`, which
-> triggers an immediate refresh from a random provider. The `perform-action` / `perform_action`
-> keys are the current Home Assistant syntax; on older cores use `call-service` / `service`.
+| Option | Default | Description |
+|---|---|---|
+| `entity` | `sensor.joke` | The joke sensor to display. |
+| `explanation_entity` | `sensor.joke_explanation` | Sensor holding the AI explanation. |
+| `title` | `Joke of the Moment` | Card heading. |
+| `show_source` | `true` | Show the source/provider line. |
+| `show_buttons` | `true` | Show the **Explain it** / **New joke** buttons. |
+
+> If you'd rather not use the custom card, a **built-in-cards-only** alternative (plus an
+> optional [Mushroom](https://github.com/piitaya/lovelace-mushroom) variant) lives in
+> [`examples/joke-cards.yaml`](examples/joke-cards.yaml) — it works with core cards only.
 
 ## API Information
 

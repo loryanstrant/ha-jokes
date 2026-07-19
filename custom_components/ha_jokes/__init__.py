@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -9,20 +10,67 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DOMAIN, CONF_REFRESH_INTERVAL, CONF_PROVIDERS, DEFAULT_REFRESH_INTERVAL, DEFAULT_PROVIDERS
+from .const import (
+    DOMAIN,
+    CONF_REFRESH_INTERVAL,
+    CONF_PROVIDERS,
+    DEFAULT_REFRESH_INTERVAL,
+    DEFAULT_PROVIDERS,
+    VERSION,
+)
 from .sensor import JokesDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
+# URL the bundled Lovelace card is served from, and the flag key used to ensure
+# the frontend resource is only registered once per Home Assistant instance.
+CARD_URL = f"/{DOMAIN}_frontend/ha-jokes-card.js"
+FRONTEND_REGISTERED = f"{DOMAIN}_frontend_registered"
+
+
+async def _async_register_frontend(hass: HomeAssistant) -> None:
+    """Serve and auto-load the bundled custom Lovelace card (idempotent)."""
+    if hass.data.get(FRONTEND_REGISTERED):
+        return
+
+    card_path = Path(__file__).parent / "www" / "ha-jokes-card.js"
+
+    try:
+        from homeassistant.components.http import StaticPathConfig
+
+        await hass.http.async_register_static_paths(
+            [StaticPathConfig(CARD_URL, str(card_path), False)]
+        )
+    except ImportError:
+        # Older cores: fall back to the (deprecated) sync registration.
+        hass.http.register_static_path(CARD_URL, str(card_path), False)
+
+    try:
+        from homeassistant.components.frontend import add_extra_js_url
+
+        # ?v= busts the browser module cache when the integration is upgraded.
+        add_extra_js_url(hass, f"{CARD_URL}?v={VERSION}")
+    except ImportError:
+        _LOGGER.warning(
+            "Could not auto-load ha-jokes-card; add %s as a Lovelace resource manually",
+            CARD_URL,
+        )
+
+    hass.data[FRONTEND_REGISTERED] = True
+    _LOGGER.debug("Registered ha-jokes-card frontend resource at %s", CARD_URL)
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Jokes from a config entry."""
     _LOGGER.debug("Setting up Jokes integration")
-    
+
     # Store the config entry data in hass.data
     hass.data.setdefault(DOMAIN, {})
+
+    # Serve and auto-load the bundled custom Lovelace card (once per instance)
+    await _async_register_frontend(hass)
     
     # Get refresh interval and providers from options
     refresh_interval = entry.options.get(
