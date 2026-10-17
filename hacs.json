@@ -4,5 +4,5 @@
   "zip_release": true,
   "filename": "ha_jokes.zip",
   "hide_default_branch": false,
-  "homeassistant": "2023.1.0"
+  "homeassistant": "2024.11.0"
 }

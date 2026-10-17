@@ -1,5 +1,29 @@
 # Breaking Changes
 
+## Version 1.7.0
+
+### Minimum Home Assistant version is now 2024.11.0
+
+**Breaking Change**: This integration now requires Home Assistant **2024.11.0** or newer.
+Previously `hacs.json` declared `2023.1.0`.
+
+The JokeAPI language selector added in this release passes `config_entry=` to
+`DataUpdateCoordinator`, which is the keyword Home Assistant expects integrations to
+supply (newer cores log a deprecation warning when it is missing). That keyword does not
+exist before **2024.11.0** — on an older core the integration fails to set up with a
+`TypeError`.
+
+#### What you need to do:
+
+- **On Home Assistant 2024.11.0 or newer**: nothing. Update as usual.
+- **On an older core**: update Home Assistant first, or stay on 1.6.0. HACS will no longer
+  offer 1.7.0 to cores below the declared minimum.
+
+#### Also in this release
+
+- The `aiohttp>=3.8.0` requirement was removed from `manifest.json`. `aiohttp` ships with
+  Home Assistant itself, so declaring it was both redundant and a hassfest error.
+
 ## Version 1.2.0
 
 ### Sensor Entity ID Changed

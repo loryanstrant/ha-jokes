@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, timedelta
+import html
 import logging
 import random
 from typing import Any
@@ -37,9 +38,6 @@ from .const import (
     ATTR_LAST_UPDATED,
     ATTR_REFRESH_INTERVAL,
     ATTR_SOURCE,
-    CONF_JOKEAPI_LANGUAGE,
-    CONF_PROVIDERS,
-    CONF_REFRESH_INTERVAL,
     DEFAULT_JOKEAPI_LANGUAGE,
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
@@ -201,6 +199,13 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
                 if response.status == 200:
                     data = await response.json()
                     parsed = provider["parser"](data)
+                    # Some providers return HTML entities in the joke text --
+                    # JokeAPI's non-English corpora in particular (e.g. the
+                    # German "gro&szlig;en"). The card renders the joke with
+                    # textContent, so they have to be decoded here or the
+                    # entity is shown literally.
+                    if parsed.get(ATTR_JOKE):
+                        parsed[ATTR_JOKE] = html.unescape(parsed[ATTR_JOKE])
                     _LOGGER.debug(
                         "Successfully fetched joke from %s", provider["name"]
                     )
@@ -252,23 +257,6 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
                 f"Error communicating with joke APIs: {exception}"
             ) from exception
 
-    def update_refresh_interval(self, refresh_interval: int) -> None:
-        """Update the refresh interval."""
-        self._refresh_interval = refresh_interval
-        self.update_interval = timedelta(minutes=refresh_interval)
-
-    def update_enabled_providers(self, enabled_providers: list[str]) -> None:
-        """Update the enabled providers."""
-        self._enabled_providers = enabled_providers if enabled_providers else DEFAULT_PROVIDERS
-        
-        # Rebuild providers list using centralized configuration
-        self._providers = [p for p in self._build_provider_configs() if p["name"] in self._enabled_providers]
-
-    def update_jokeapi_language(self, jokeapi_language: str) -> None:
-        """Update the JokeAPI language setting."""
-        self._jokeapi_language = jokeapi_language or DEFAULT_JOKEAPI_LANGUAGE
-        self._providers = [p for p in self._build_provider_configs() if p["name"] in self._enabled_providers]
-
 
 class JokesSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Jokes sensor."""
@@ -306,32 +294,10 @@ class JokesSensor(CoordinatorEntity, SensorEntity):
             ATTR_REFRESH_INTERVAL: self.coordinator.data.get(ATTR_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL),
         }
 
-    async def async_added_to_hass(self) -> None:
-        """When entity is added to hass."""
-        await super().async_added_to_hass()
-        
-        # Listen for options updates
-        self._config_entry.async_on_unload(
-            self._config_entry.add_update_listener(self._async_update_options)
-        )
-
-    async def _async_update_options(
-        self, hass: HomeAssistant, config_entry: ConfigEntry
-    ) -> None:
-        """Update options."""
-        refresh_interval = config_entry.options.get(
-            CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
-        )
-        enabled_providers = config_entry.options.get(
-            CONF_PROVIDERS, DEFAULT_PROVIDERS
-        )
-        jokeapi_language = config_entry.options.get(
-            CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
-        )
-        self.coordinator.update_refresh_interval(refresh_interval)
-        self.coordinator.update_enabled_providers(enabled_providers)
-        self.coordinator.update_jokeapi_language(jokeapi_language)
-        await self.coordinator.async_request_refresh()
+    # No options listener here on purpose: __init__.py registers
+    # async_reload_entry, which rebuilds the coordinator and both entities from
+    # the saved options. A second listener on the same entry would duplicate
+    # that work, and its signature has to match what core calls it with.
 
 
 class JokeExplanationSensor(CoordinatorEntity, SensorEntity):

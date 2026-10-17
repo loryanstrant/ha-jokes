@@ -2,7 +2,7 @@
 
 DOMAIN = "ha_jokes"
 NAME = "Jokes"
-VERSION = "1.6.0"
+VERSION = "1.7.0"
 
 # API Configuration for icanhazdadjoke.com
 API_URL_ICANHAZDADJOKE = "https://icanhazdadjoke.com"
