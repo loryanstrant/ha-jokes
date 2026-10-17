@@ -23,6 +23,19 @@ exist before **2024.11.0** — on an older core the integration fails to set up 
 
 - The `aiohttp>=3.8.0` requirement was removed from `manifest.json`. `aiohttp` ships with
   Home Assistant itself, so declaring it was both redundant and a hassfest error.
+- **French and Portuguese are not offered in the JokeAPI language dropdown.** JokeAPI lists
+  six joke languages, but this integration asks it for single-line jokes (`type=single`) and
+  JokeAPI holds **no** single-line French or Portuguese jokes — every one of them is a
+  two-part setup-and-punchline joke. Selecting either returned HTTP 400 on every call, which
+  took `sensor.joke` permanently offline when JokeAPI was the only enabled provider. The
+  dropdown now offers Czech, German, English and Spanish, which all return jokes. Supporting
+  the other two means rendering two-part jokes; that is a feature change, not a fix, and is
+  left for a later release. If an entry somehow holds a language code that is no longer
+  offered, the integration now logs a warning and falls back to English rather than wedging.
+- **Saving the options now clears the current joke explanation.** Options changes are applied
+  by reloading the config entry, which recreates `sensor.joke_explanation` from scratch. Ask
+  for a fresh explanation after changing settings. Previously the explanation survived, but
+  only because the settings were not reliably applied at all.
 
 ## Version 1.2.0
 

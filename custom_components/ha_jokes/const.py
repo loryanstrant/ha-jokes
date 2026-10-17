@@ -83,13 +83,19 @@ DEFAULT_PROVIDERS = [
     PROVIDER_OFFICIAL,
 ]
 DEFAULT_JOKEAPI_LANGUAGE = "en"
+# JokeAPI declares six joke languages, but we query it with type=single and its
+# French and Portuguese corpora contain *only* two-part (setup/delivery) jokes.
+# Asking for either returns HTTP 400 "No matching joke found" on every call, so
+# offering them in the dropdown would let someone pick a value that can never
+# produce a joke. Verified live 2026-10-17 against /joke/Any and /info:
+#   safe single-type jokes -- en 183, de 29, es 6, cs 2, pt 0, fr 0
+# To offer French and Portuguese we would have to stop hard-coding
+# type=single and render two-part jokes; see the note in BREAKING_CHANGES.md.
 JOKEAPI_LANGUAGE_OPTIONS = {
     "cs": "Czech",
     "de": "German",
     "en": "English",
     "es": "Spanish",
-    "fr": "French",
-    "pt": "Portuguese",
 }
 
 # States

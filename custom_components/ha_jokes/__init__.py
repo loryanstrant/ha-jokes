@@ -18,6 +18,7 @@ from .const import (
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
+    JOKEAPI_LANGUAGE_OPTIONS,
     VERSION,
 )
 from .sensor import JokesDataUpdateCoordinator
@@ -84,7 +85,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     jokeapi_language = entry.options.get(
         CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
     )
-    
+    # Fall back to the default if the saved language is no longer offered.
+    # Without this, an entry holding a withdrawn code keeps asking JokeAPI for
+    # it, JokeAPI keeps answering HTTP 400, and the entry never leaves
+    # setup_retry -- which is the failure this release exists to remove.
+    if jokeapi_language not in JOKEAPI_LANGUAGE_OPTIONS:
+        _LOGGER.warning(
+            "JokeAPI language %r is no longer supported; falling back to %s",
+            jokeapi_language,
+            DEFAULT_JOKEAPI_LANGUAGE,
+        )
+        jokeapi_language = DEFAULT_JOKEAPI_LANGUAGE
+
+
     # Create coordinator
     coordinator = JokesDataUpdateCoordinator(
         hass,
