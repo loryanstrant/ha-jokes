@@ -23,7 +23,7 @@ A custom Home Assistant integration that fetches random jokes from multiple sour
 - 📊 Creates a sensor entity with state "OK" when successful
 - 🏷️ Stores joke text, ID, and source as attributes (no 255 character state limitation)
 - ⏰ Configurable refresh interval (1-1440 minutes, default: 5 minutes)
-- 🌍 **Pick the language JokeAPI answers in** — Czech, German, English, Spanish, French or Portuguese (default: English)
+- 🌍 **Pick the language JokeAPI answers in** — Czech, German, English or Spanish (default: English)
 - 🤖 AI-powered joke explanations using Home Assistant's AI integration
 - ⚙️ Easy configuration through Home Assistant UI
 - 🔄 Supports options flow for changing settings
@@ -92,8 +92,6 @@ so existing installations are unaffected.
 | `de` | German |
 | `en` | English (default) |
 | `es` | Spanish |
-| `fr` | French |
-| `pt` | Portuguese |
 
 > ⚠️ **This setting only affects JokeAPI**, because it is the only one of the five sources
 > that serves jokes in more than one language. icanhazdadjoke, Official Joke API, Geek Jokes
@@ -101,8 +99,14 @@ so existing installations are unaffected.
 > de-select the other providers and leave only **JokeAPI** enabled — otherwise you will get a
 > mix of your chosen language and English.
 >
-> JokeAPI's non-English collections are smaller than its English one, so you may see jokes
-> repeat sooner. If JokeAPI has nothing to return, the integration falls back to the next
+> JokeAPI's non-English collections are **much** smaller than its English one, so you will
+> see jokes repeat sooner — as of October 2026 it holds 183 English jokes of the kind this
+> integration asks for, against 29 German, 6 Spanish and 2 Czech.
+>
+> French and Portuguese are deliberately **not** offered: JokeAPI lists them, but every one
+> of its French and Portuguese jokes is a two-part setup-and-punchline joke, and this
+> integration asks for single-line jokes only. Selecting them would mean JokeAPI never
+> returning anything at all. If JokeAPI has nothing to return, the integration falls back to the next
 > enabled provider as usual.
 
 
@@ -397,7 +401,7 @@ This integration fetches jokes from several different sources, automatically sel
 2. **[JokeAPI v2](https://v2.jokeapi.dev/)** - A RESTful API serving jokes
    - Configured in safe mode (no explicit content)
    - Returns single-line jokes only
-   - 🌍 **Multi-lingual** — Czech, German, English, Spanish, French and Portuguese, selectable
+   - 🌍 **Multi-lingual** — Czech, German, English and Spanish, selectable
      in the integration options (see [Joke Language](#joke-language)). The only source here
      that is not English-only
    - Free and open source

@@ -12,7 +12,7 @@
  * Version is kept in lockstep with the integration's manifest.json.
  */
 
-const CARD_VERSION = "1.6.0";
+const CARD_VERSION = "1.7.0";
 
 console.info(
   `%c HA-JOKES-CARD %c v${CARD_VERSION} `,

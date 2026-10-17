@@ -164,6 +164,10 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
         current_jokeapi_language = self._config_entry.options.get(
             CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
         )
+        # Never pre-select a language the dropdown no longer offers, or the
+        # form opens with a selection that is not one of its own choices.
+        if current_jokeapi_language not in JOKEAPI_LANGUAGE_OPTIONS:
+            current_jokeapi_language = DEFAULT_JOKEAPI_LANGUAGE
 
         # Schema for the options form
         options_schema = vol.Schema(

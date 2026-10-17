@@ -18,6 +18,7 @@ from .const import (
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
+    JOKEAPI_LANGUAGE_OPTIONS,
     VERSION,
 )
 from .sensor import JokesDataUpdateCoordinator
@@ -84,7 +85,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     jokeapi_language = entry.options.get(
         CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
     )
-    
+    # Fall back to the default if the saved language is no longer offered.
+    # Without this, an entry holding a withdrawn code keeps asking JokeAPI for
+    # it, JokeAPI keeps answering HTTP 400, and the entry never leaves
+    # setup_retry -- which is the failure this release exists to remove.
+    if jokeapi_language not in JOKEAPI_LANGUAGE_OPTIONS:
+        _LOGGER.warning(
+            "JokeAPI language %r is no longer supported; falling back to %s",
+            jokeapi_language,
+            DEFAULT_JOKEAPI_LANGUAGE,
+        )
+        jokeapi_language = DEFAULT_JOKEAPI_LANGUAGE
+
+
     # Create coordinator
     coordinator = JokesDataUpdateCoordinator(
         hass,
@@ -156,6 +169,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload config entry."""
-    await async_unload_entry(hass, entry)
-    await async_setup_entry(hass, entry)
+    """Reload config entry when its options change.
+
+    Hand the reload to Home Assistant rather than calling async_unload_entry /
+    async_setup_entry directly: core moves the entry back to SETUP_IN_PROGRESS
+    first, which is the only state in which the coordinator's
+    async_config_entry_first_refresh() is allowed to run.
+    """
+    await hass.config_entries.async_reload(entry.entry_id)
