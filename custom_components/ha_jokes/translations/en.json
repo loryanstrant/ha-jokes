@@ -6,10 +6,12 @@
         "description": "Configure your Jokes integration",
         "data": {
           "refresh_interval": "Refresh interval (minutes)",
-          "providers": "Joke providers"
+          "providers": "Joke providers",
+          "jokeapi_language": "JokeAPI language"
         },
         "data_description": {
-          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default."
+          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default.",
+          "jokeapi_language": "Choose the language to request from JokeAPI when that provider is enabled."
         }
       }
     },
@@ -25,10 +27,12 @@
         "description": "Configure Jokes options",
         "data": {
           "refresh_interval": "Refresh interval (minutes)",
-          "providers": "Joke providers"
+          "providers": "Joke providers",
+          "jokeapi_language": "JokeAPI language"
         },
         "data_description": {
-          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default."
+          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default.",
+          "jokeapi_language": "Choose the language to request from JokeAPI when that provider is enabled."
         }
       }
     },

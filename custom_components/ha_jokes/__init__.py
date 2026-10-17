@@ -11,11 +11,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
-    DOMAIN,
-    CONF_REFRESH_INTERVAL,
+    CONF_JOKEAPI_LANGUAGE,
     CONF_PROVIDERS,
-    DEFAULT_REFRESH_INTERVAL,
+    CONF_REFRESH_INTERVAL,
+    DEFAULT_JOKEAPI_LANGUAGE,
     DEFAULT_PROVIDERS,
+    DEFAULT_REFRESH_INTERVAL,
+    DOMAIN,
     VERSION,
 )
 from .sensor import JokesDataUpdateCoordinator
@@ -79,9 +81,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     enabled_providers = entry.options.get(
         CONF_PROVIDERS, DEFAULT_PROVIDERS
     )
+    jokeapi_language = entry.options.get(
+        CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
+    )
     
     # Create coordinator
-    coordinator = JokesDataUpdateCoordinator(hass, refresh_interval, enabled_providers)
+    coordinator = JokesDataUpdateCoordinator(
+        hass,
+        refresh_interval,
+        enabled_providers,
+        jokeapi_language,
+        entry,
+    )
     
     # Fetch initial data - this can raise ConfigEntryNotReady
     try:

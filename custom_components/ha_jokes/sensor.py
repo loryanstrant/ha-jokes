@@ -37,8 +37,10 @@ from .const import (
     ATTR_LAST_UPDATED,
     ATTR_REFRESH_INTERVAL,
     ATTR_SOURCE,
+    CONF_JOKEAPI_LANGUAGE,
     CONF_PROVIDERS,
     CONF_REFRESH_INTERVAL,
+    DEFAULT_JOKEAPI_LANGUAGE,
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
@@ -86,7 +88,7 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             },
             {
                 "name": PROVIDER_JOKEAPI,
-                "url": API_URL_JOKEAPI,
+                "url": f"{API_URL_JOKEAPI}&lang={self._jokeapi_language}",
                 "headers": API_HEADERS_JOKEAPI,
                 "parser": self._parse_jokeapi,
             },
@@ -110,11 +112,19 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             },
         ]
 
-    def __init__(self, hass: HomeAssistant, refresh_interval: int, enabled_providers: list[str]) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        refresh_interval: int,
+        enabled_providers: list[str],
+        jokeapi_language: str | None = None,
+        config_entry: ConfigEntry | None = None,
+    ) -> None:
         """Initialize."""
         self.platforms = []
         self._refresh_interval = refresh_interval
         self._enabled_providers = enabled_providers if enabled_providers else DEFAULT_PROVIDERS
+        self._jokeapi_language = jokeapi_language or DEFAULT_JOKEAPI_LANGUAGE
         
         # Filter to only enabled providers
         self._providers = [p for p in self._build_provider_configs() if p["name"] in self._enabled_providers]
@@ -124,6 +134,7 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(minutes=refresh_interval),
+            config_entry=config_entry,
         )
 
     def _parse_icanhazdadjoke(self, data: dict) -> dict[str, Any]:
@@ -253,6 +264,11 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
         # Rebuild providers list using centralized configuration
         self._providers = [p for p in self._build_provider_configs() if p["name"] in self._enabled_providers]
 
+    def update_jokeapi_language(self, jokeapi_language: str) -> None:
+        """Update the JokeAPI language setting."""
+        self._jokeapi_language = jokeapi_language or DEFAULT_JOKEAPI_LANGUAGE
+        self._providers = [p for p in self._build_provider_configs() if p["name"] in self._enabled_providers]
+
 
 class JokesSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Jokes sensor."""
@@ -299,7 +315,9 @@ class JokesSensor(CoordinatorEntity, SensorEntity):
             self._config_entry.add_update_listener(self._async_update_options)
         )
 
-    async def _async_update_options(self, config_entry: ConfigEntry) -> None:
+    async def _async_update_options(
+        self, hass: HomeAssistant, config_entry: ConfigEntry
+    ) -> None:
         """Update options."""
         refresh_interval = config_entry.options.get(
             CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL
@@ -307,8 +325,12 @@ class JokesSensor(CoordinatorEntity, SensorEntity):
         enabled_providers = config_entry.options.get(
             CONF_PROVIDERS, DEFAULT_PROVIDERS
         )
+        jokeapi_language = config_entry.options.get(
+            CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
+        )
         self.coordinator.update_refresh_interval(refresh_interval)
         self.coordinator.update_enabled_providers(enabled_providers)
+        self.coordinator.update_jokeapi_language(jokeapi_language)
         await self.coordinator.async_request_refresh()
 
 

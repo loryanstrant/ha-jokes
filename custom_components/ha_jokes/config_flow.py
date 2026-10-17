@@ -10,13 +10,17 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import selector
 
 from .const import (
+    CONF_JOKEAPI_LANGUAGE,
     CONF_PROVIDERS,
     CONF_REFRESH_INTERVAL,
+    DEFAULT_JOKEAPI_LANGUAGE,
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
+    JOKEAPI_LANGUAGE_OPTIONS,
     MAX_REFRESH_INTERVAL,
     MIN_REFRESH_INTERVAL,
     NAME,
@@ -51,6 +55,10 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             providers = user_input.get(CONF_PROVIDERS, [])
             if not providers:
                 errors[CONF_PROVIDERS] = "no_providers_selected"
+
+            jokeapi_language = user_input.get(
+                CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
+            )
             
             if not errors:
                 # Create the config entry
@@ -60,6 +68,7 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     options={
                         CONF_REFRESH_INTERVAL: refresh_interval,
                         CONF_PROVIDERS: providers,
+                        CONF_JOKEAPI_LANGUAGE: jokeapi_language,
                     },
                 )
 
@@ -78,6 +87,18 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     PROVIDER_GEEKJOKES: "Geek Jokes (⚠️ not family-friendly)",
                     PROVIDER_YOMAMA: "Yo Mama Jokes (⚠️ not family-friendly)",
                 }),
+                vol.Optional(
+                    CONF_JOKEAPI_LANGUAGE,
+                    default=DEFAULT_JOKEAPI_LANGUAGE,
+                ): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=[
+                            selector.SelectOptionDict(value=code, label=label)
+                            for code, label in JOKEAPI_LANGUAGE_OPTIONS.items()
+                        ],
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             }
         )
 
@@ -120,9 +141,18 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
             providers = user_input.get(CONF_PROVIDERS, [])
             if not providers:
                 errors[CONF_PROVIDERS] = "no_providers_selected"
-            
+
+            jokeapi_language = user_input.get(
+                CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
+            )
             if not errors:
-                return self.async_create_entry(title="", data=user_input)
+                return self.async_create_entry(
+                    title="",
+                    data={
+                        **user_input,
+                        CONF_JOKEAPI_LANGUAGE: jokeapi_language,
+                    },
+                )
 
         # Get current options or defaults
         current_refresh_interval = self._config_entry.options.get(
@@ -130,6 +160,9 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
         )
         current_providers = self._config_entry.options.get(
             CONF_PROVIDERS, DEFAULT_PROVIDERS
+        )
+        current_jokeapi_language = self._config_entry.options.get(
+            CONF_JOKEAPI_LANGUAGE, DEFAULT_JOKEAPI_LANGUAGE
         )
 
         # Schema for the options form
@@ -147,6 +180,18 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
                     PROVIDER_GEEKJOKES: "Geek Jokes (⚠️ not family-friendly)",
                     PROVIDER_YOMAMA: "Yo Mama Jokes (⚠️ not family-friendly)",
                 }),
+                vol.Optional(
+                    CONF_JOKEAPI_LANGUAGE,
+                    default=current_jokeapi_language,
+                ): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=[
+                            selector.SelectOptionDict(value=code, label=label)
+                            for code, label in JOKEAPI_LANGUAGE_OPTIONS.items()
+                        ],
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             }
         )
 
