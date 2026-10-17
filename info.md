@@ -9,6 +9,7 @@ This integration fetches random jokes from up to five different joke APIs and ma
 ## Key Features
 
 - 🎭 **Multiple Joke Sources**: Fetches from icanhazdadjoke.com, JokeAPI v2, and Official Joke API — plus Geek Jokes and Yo Mama, which serve unfiltered adult/edgy content and are **opt-in only**
+- 🌍 **Not English-only**: JokeAPI can be asked for Czech, German, English, Spanish, French or Portuguese jokes (default: English). The other four sources are English-only, so leave only JokeAPI enabled if you want one language throughout
 - 🃏 **Bundled Lovelace Card**: `custom:ha-jokes-card` is included and auto-registered — nothing extra to install, no resource to add by hand. Just pick **"Jokes Card"** in the card picker
 - 🔀 **Random Selection**: Providers are randomly selected for variety
 - 🛡️ **Fault Tolerance**: Automatically tries alternative providers if one fails
@@ -35,6 +36,7 @@ This integration fetches random jokes from up to five different joke APIs and ma
 - **Icon**: 🙂 (mdi:emoticon-happy-outline)
 - **Updates**: Configurable interval from 1-1440 minutes
 - **APIs**: Uses icanhazdadjoke.com, JokeAPI v2 (safe mode), and Official Joke API by default; Geek Jokes and Yo Mama can be enabled in the options flow (no API keys required)
+- **Languages**: `cs`, `de`, `en` (default), `es`, `fr`, `pt` — JokeAPI only
 - **Card**: `custom:ha-jokes-card` — shows the joke, its source, how long ago it updated, and **Explain it** / **New joke** buttons
 
 Ready to add some humor to your smart home? Install now and let the laughs begin! 😄

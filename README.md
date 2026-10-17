@@ -23,6 +23,7 @@ A custom Home Assistant integration that fetches random jokes from multiple sour
 - 📊 Creates a sensor entity with state "OK" when successful
 - 🏷️ Stores joke text, ID, and source as attributes (no 255 character state limitation)
 - ⏰ Configurable refresh interval (1-1440 minutes, default: 5 minutes)
+- 🌍 **Pick the language JokeAPI answers in** — Czech, German, English, Spanish, French or Portuguese (default: English)
 - 🤖 AI-powered joke explanations using Home Assistant's AI integration
 - ⚙️ Easy configuration through Home Assistant UI
 - 🔄 Supports options flow for changing settings
@@ -61,7 +62,8 @@ Or open it directly from here:
 2. Click **"+ Add Integration"**
 3. Search for **"Jokes"**
 4. Set your desired refresh interval (1-1440 minutes, default: 5)
-5. Click **"Submit"**
+5. Pick the **JokeAPI language** if you want something other than English
+6. Click **"Submit"**
 
 ### Changing Options
 
@@ -70,12 +72,38 @@ Or open it directly from here:
 3. Click **"Configure"**
 4. Adjust the refresh interval as needed
 5. Select/de-select joke providers
-6. Click **"Submit"**
+6. Change the **JokeAPI language** if you want something other than English
+7. Click **"Submit"**
 
 The setup and options screens list every joke source. The two opt-in sources are labelled
 **⚠️ not family-friendly** and are unchecked by default:
 
 <img alt="Jokes setup dialog — choosing joke providers, with Geek Jokes and Yo Mama marked not family-friendly and off by default" src="images/config-flow.png" width="640" />
+
+### Joke Language
+
+**JokeAPI language** sets the language that [JokeAPI v2](https://v2.jokeapi.dev/) is asked
+for. It is available on both the setup and the options screens, and defaults to **English**,
+so existing installations are unaffected.
+
+| Code | Language |
+|------|----------|
+| `cs` | Czech |
+| `de` | German |
+| `en` | English (default) |
+| `es` | Spanish |
+| `fr` | French |
+| `pt` | Portuguese |
+
+> ⚠️ **This setting only affects JokeAPI**, because it is the only one of the five sources
+> that serves jokes in more than one language. icanhazdadjoke, Official Joke API, Geek Jokes
+> and Yo Mama Jokes are English-only. If you want jokes exclusively in another language,
+> de-select the other providers and leave only **JokeAPI** enabled — otherwise you will get a
+> mix of your chosen language and English.
+>
+> JokeAPI's non-English collections are smaller than its English one, so you may see jokes
+> repeat sooner. If JokeAPI has nothing to return, the integration falls back to the next
+> enabled provider as usual.
 
 
 ## Usage
@@ -369,6 +397,9 @@ This integration fetches jokes from several different sources, automatically sel
 2. **[JokeAPI v2](https://v2.jokeapi.dev/)** - A RESTful API serving jokes
    - Configured in safe mode (no explicit content)
    - Returns single-line jokes only
+   - 🌍 **Multi-lingual** — Czech, German, English, Spanish, French and Portuguese, selectable
+     in the integration options (see [Joke Language](#joke-language)). The only source here
+     that is not English-only
    - Free and open source
    - No API key required
 
