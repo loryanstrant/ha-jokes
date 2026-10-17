@@ -56,6 +56,7 @@ SENSOR_ICON = "mdi:emoticon-happy-outline"
 # Configuration Keys
 CONF_REFRESH_INTERVAL = "refresh_interval"
 CONF_PROVIDERS = "providers"
+CONF_JOKEAPI_LANGUAGE = "jokeapi_language"
 
 # Attributes
 ATTR_JOKE = "joke"
@@ -81,6 +82,15 @@ DEFAULT_PROVIDERS = [
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
 ]
+DEFAULT_JOKEAPI_LANGUAGE = "en"
+JOKEAPI_LANGUAGE_OPTIONS = {
+    "cs": "Czech",
+    "de": "German",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "pt": "Portuguese",
+}
 
 # States
 STATE_OK = "OK"
