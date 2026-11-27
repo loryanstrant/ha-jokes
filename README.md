@@ -17,13 +17,14 @@ A custom Home Assistant integration that fetches random jokes from multiple sour
 
 ## Features
 
-- 🎭 Fetches random jokes from **5 built-in sources** — 3 family-friendly (on by default) plus 2 opt-in sources clearly marked **⚠️ not family-friendly**
+- 🎭 Fetches random jokes from **7 built-in sources** — 3 family-friendly (on by default) plus 4 opt-in sources: 2 English ones clearly marked **⚠️ not family-friendly** and 2 German-only ones ([WitzAPI](#german-jokes) and Deine-Mutter-API)
 - 🔀 Random provider selection for variety
 - 🛡️ Fault tolerance - automatically tries alternative providers if one fails
 - 📊 Creates a sensor entity with state "OK" when successful
 - 🏷️ Stores joke text, ID, and source as attributes (no 255 character state limitation)
 - ⏰ Configurable refresh interval (1-1440 minutes, default: 5 minutes)
 - 🌍 **Pick the language JokeAPI answers in** — Czech, German, English or Spanish (default: English)
+- 🇩🇪 **Optional German-only sources** — WitzAPI and Deine-Mutter-API, off by default
 - 🤖 AI-powered joke explanations using Home Assistant's AI integration
 - ⚙️ Easy configuration through Home Assistant UI
 - 🔄 Supports options flow for changing settings
@@ -75,8 +76,9 @@ Or open it directly from here:
 6. Change the **JokeAPI language** if you want something other than English
 7. Click **"Submit"**
 
-The setup and options screens list every joke source. The two opt-in sources are labelled
-**⚠️ not family-friendly** and are unchecked by default:
+The setup and options screens list every joke source. The opt-in sources are unchecked by
+default; Geek Jokes, Yo Mama and Deine-Mutter-API are labelled **⚠️ not family-friendly**, and
+the two German-only sources are labelled **(German)**:
 
 <img alt="Jokes setup dialog — choosing joke providers, with Geek Jokes and Yo Mama marked not family-friendly and off by default" src="images/config-flow.png" width="640" />
 
@@ -93,11 +95,12 @@ so existing installations are unaffected.
 | `en` | English (default) |
 | `es` | Spanish |
 
-> ⚠️ **This setting only affects JokeAPI**, because it is the only one of the five sources
-> that serves jokes in more than one language. icanhazdadjoke, Official Joke API, Geek Jokes
-> and Yo Mama Jokes are English-only. If you want jokes exclusively in another language,
-> de-select the other providers and leave only **JokeAPI** enabled — otherwise you will get a
-> mix of your chosen language and English.
+> ⚠️ **This setting only affects JokeAPI**, because it is the only source that serves jokes
+> in more than one language. icanhazdadjoke, Official Joke API, Geek Jokes and Yo Mama Jokes
+> are English-only; WitzAPI and Deine-Mutter-API are German-only. If you want jokes exclusively
+> in another language, de-select the other providers and leave only **JokeAPI** enabled
+> (plus the German sources, for German — see [German jokes](#german-jokes)) — otherwise you
+> will get a mix of your chosen language and English.
 >
 > JokeAPI's non-English collections are **much** smaller than its English one, so you will
 > see jokes repeat sooner — as of October 2026 it holds 183 English jokes of the kind this
@@ -108,6 +111,26 @@ so existing installations are unaffected.
 > integration asks for single-line jokes only. Selecting them would mean JokeAPI never
 > returning anything at all. If JokeAPI has nothing to return, the integration falls back to the next
 > enabled provider as usual.
+
+### German jokes
+
+Two German-only sources can be switched on alongside (or instead of) JokeAPI in German, whose
+German pool is only 29 jokes. Both are **off by default**, so existing installations are
+unaffected:
+
+- **WitzAPI** ([witzapi.de](https://witzapi.de/)) — general German jokes (Flachwitze,
+  Lehrerwitze, Programmierwitze, Scherzfragen, …)
+- **Deine-Mutter-API** ([deine-mutter.timkley.dev](https://deine-mutter.timkley.dev/)) —
+  roughly 85 "Deine Mutter" jokes. ⚠️ **Not family-friendly** — it is the German counterpart
+  of Yo Mama (roast humour)
+
+To get German jokes only:
+
+1. Open **Settings** → **Devices & Services** → **Jokes** → **Configure**
+2. Under **Joke providers**, tick **WitzAPI (German)** and/or **Deine-Mutter-API (German, ⚠️ not family-friendly)**
+3. Optionally keep **JokeAPI** ticked and set **JokeAPI language** to **German**
+4. Untick icanhazdadjoke.com, Official Joke API, Geek Jokes and Yo Mama Jokes (they are English-only)
+5. Click **Submit**
 
 
 ## Usage
@@ -423,6 +446,16 @@ This integration fetches jokes from several different sources, automatically sel
    - Returns single-line jokes
    - Free, no API key required
 
+6. **[WitzAPI](https://witzapi.de/)** - German jokes
+   - 🇩🇪 **German only** — **disabled by default**; opt in via the integration options (see [German jokes](#german-jokes))
+   - Returns single-line jokes
+   - Free, no API key required
+
+7. **[Deine-Mutter-API](https://deine-mutter.timkley.dev/)** - German "Deine Mutter" jokes
+   - 🇩🇪 **German only**, ⚠️ **not family-friendly** (roast humour, like Yo Mama) — **disabled by default**; opt in via the integration options
+   - Returns single-line jokes (about 85 in total, so expect repeats)
+   - Free, no API key required
+
 The integration randomly selects which provider to use for each joke request. If a provider fails to respond, it automatically tries the next provider, ensuring you always get a joke as long as at least one service is available.
 
 ## Troubleshooting
@@ -481,4 +514,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz
   - [Geek Jokes](https://github.com/sameerkumar18/geek-joke-api) by Sameer Kumar (unfiltered, opt-in)
   - [Yo Mama Jokes](https://www.yomama-jokes.com/) (adult/roast humour, opt-in)
+  - [WitzAPI](https://witzapi.de/) (German, opt-in)
+  - [Deine-Mutter-API](https://deine-mutter.timkley.dev/) (German roast humour, opt-in)
 - Integration developed for the Home Assistant community

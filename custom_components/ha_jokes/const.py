@@ -40,6 +40,23 @@ API_HEADERS_YOMAMA = {
     "User-Agent": "Home Assistant Jokes Integration",
 }
 
+# API Configuration for WitzAPI (German only). Returns a JSON array of jokes; an
+# optional &category=flachwitze|lehrerwitze|... narrows the pool, and an unknown
+# category yields an empty array.
+API_URL_WITZAPI = "https://witzapi.de/api/joke/?limit=1&language=de"
+API_HEADERS_WITZAPI = {
+    "Accept": "application/json",
+    "User-Agent": "Home Assistant Jokes Integration",
+}
+
+# API Configuration for Deine-Mutter-API (German "your mother" roast humour —
+# the German counterpart of Yo Mama, so likewise not family-friendly)
+API_URL_DEINEMUTTER = "https://deine-mutter.timkley.dev/api"
+API_HEADERS_DEINEMUTTER = {
+    "Accept": "application/json",
+    "User-Agent": "Home Assistant Jokes Integration",
+}
+
 # Legacy API constants (for backward compatibility)
 API_URL = API_URL_ICANHAZDADJOKE
 API_HEADERS = API_HEADERS_ICANHAZDADJOKE
@@ -72,11 +89,15 @@ PROVIDER_JOKEAPI = "jokeapi"
 PROVIDER_OFFICIAL = "official_joke_api"
 PROVIDER_GEEKJOKES = "geek_jokes"
 PROVIDER_YOMAMA = "yomama_jokes"
+PROVIDER_WITZAPI = "witzapi"
+PROVIDER_DEINEMUTTER = "deine_mutter"
 
 # Default providers (family-friendly sources enabled by default).
 # PROVIDER_GEEKJOKES and PROVIDER_YOMAMA are intentionally excluded — both serve
 # unfiltered adult/edgy content (Geek Jokes is largely Chuck Norris + crude material;
 # Yo Mama is roast humour) and must be opted into explicitly.
+# PROVIDER_WITZAPI and PROVIDER_DEINEMUTTER are German-only, so they are opt-in to
+# keep English setups unchanged; Deine Mutter is also roast humour like Yo Mama.
 DEFAULT_PROVIDERS = [
     PROVIDER_ICANHAZDADJOKE,
     PROVIDER_JOKEAPI,

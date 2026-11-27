@@ -10,7 +10,7 @@
           "jokeapi_language": "JokeAPI language"
         },
         "data_description": {
-          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default.",
+          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default. \"WitzAPI\" and \"Deine-Mutter-API\" serve German-language jokes only and are off by default; \"Deine-Mutter-API\" is roast humour like Yo Mama and is not family-friendly either.",
           "jokeapi_language": "Choose the language to request from JokeAPI when that provider is enabled."
         }
       }
@@ -31,7 +31,7 @@
           "jokeapi_language": "JokeAPI language"
         },
         "data_description": {
-          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default.",
+          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default. \"WitzAPI\" and \"Deine-Mutter-API\" serve German-language jokes only and are off by default; \"Deine-Mutter-API\" is roast humour like Yo Mama and is not family-friendly either.",
           "jokeapi_language": "Choose the language to request from JokeAPI when that provider is enabled."
         }
       }

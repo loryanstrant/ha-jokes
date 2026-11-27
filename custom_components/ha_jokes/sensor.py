@@ -22,15 +22,19 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import (
+    API_HEADERS_DEINEMUTTER,
     API_HEADERS_GEEKJOKES,
     API_HEADERS_ICANHAZDADJOKE,
     API_HEADERS_JOKEAPI,
     API_HEADERS_OFFICIAL,
+    API_HEADERS_WITZAPI,
     API_HEADERS_YOMAMA,
+    API_URL_DEINEMUTTER,
     API_URL_GEEKJOKES,
     API_URL_ICANHAZDADJOKE,
     API_URL_JOKEAPI,
     API_URL_OFFICIAL,
+    API_URL_WITZAPI,
     API_URL_YOMAMA,
     ATTR_EXPLANATION,
     ATTR_JOKE,
@@ -42,10 +46,12 @@ from .const import (
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
+    PROVIDER_DEINEMUTTER,
     PROVIDER_GEEKJOKES,
     PROVIDER_ICANHAZDADJOKE,
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
+    PROVIDER_WITZAPI,
     PROVIDER_YOMAMA,
     SENSOR_ICON,
     SENSOR_NAME,
@@ -107,6 +113,18 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
                 "url": API_URL_YOMAMA,
                 "headers": API_HEADERS_YOMAMA,
                 "parser": self._parse_yomama,
+            },
+            {
+                "name": PROVIDER_WITZAPI,
+                "url": API_URL_WITZAPI,
+                "headers": API_HEADERS_WITZAPI,
+                "parser": self._parse_witzapi,
+            },
+            {
+                "name": PROVIDER_DEINEMUTTER,
+                "url": API_URL_DEINEMUTTER,
+                "headers": API_HEADERS_DEINEMUTTER,
+                "parser": self._parse_deinemutter,
             },
         ]
 
@@ -186,6 +204,34 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             ATTR_JOKE: data.get("joke", ""),
             ATTR_JOKE_ID: "",
             ATTR_SOURCE: "yomama-jokes.com",
+        }
+
+    def _parse_witzapi(self, data: list) -> dict[str, Any]:
+        """Parse WitzAPI response (German)."""
+        # WitzAPI returns a JSON array (empty for an unknown category) of
+        # {"text", "language"} objects and no id. Raising lets
+        # _fetch_from_provider log it and move on to the next provider.
+        if not isinstance(data, list) or not data or not isinstance(data[0], dict):
+            raise ValueError(f"unexpected WitzAPI payload: {data!r:.100}")
+        joke_text = data[0].get("text")
+        if not joke_text:
+            raise ValueError("WitzAPI returned a joke without text")
+        return {
+            ATTR_JOKE: joke_text,
+            ATTR_JOKE_ID: "",
+            ATTR_SOURCE: "witzapi.de",
+        }
+
+    def _parse_deinemutter(self, data: dict) -> dict[str, Any]:
+        """Parse Deine-Mutter-API response (German roast humour)."""
+        # Deine-Mutter-API returns a single 'joke' field and no id
+        joke_text = data.get("joke") if isinstance(data, dict) else None
+        if not joke_text:
+            raise ValueError(f"unexpected Deine-Mutter-API payload: {data!r:.100}")
+        return {
+            ATTR_JOKE: joke_text,
+            ATTR_JOKE_ID: "",
+            ATTR_SOURCE: "deine-mutter.timkley.dev",
         }
 
     async def _fetch_from_provider(
