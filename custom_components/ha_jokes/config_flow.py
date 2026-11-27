@@ -24,10 +24,12 @@ from .const import (
     MAX_REFRESH_INTERVAL,
     MIN_REFRESH_INTERVAL,
     NAME,
+    PROVIDER_DEINEMUTTER,
     PROVIDER_GEEKJOKES,
     PROVIDER_ICANHAZDADJOKE,
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
+    PROVIDER_WITZAPI,
     PROVIDER_YOMAMA,
 )
 
@@ -86,6 +88,8 @@ class JokesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     PROVIDER_OFFICIAL: "Official Joke API",
                     PROVIDER_GEEKJOKES: "Geek Jokes (⚠️ not family-friendly)",
                     PROVIDER_YOMAMA: "Yo Mama Jokes (⚠️ not family-friendly)",
+                    PROVIDER_WITZAPI: "WitzAPI (German)",
+                    PROVIDER_DEINEMUTTER: "Deine-Mutter-API (German, ⚠️ not family-friendly)",
                 }),
                 vol.Optional(
                     CONF_JOKEAPI_LANGUAGE,
@@ -183,6 +187,8 @@ class JokesOptionsFlow(config_entries.OptionsFlow):
                     PROVIDER_OFFICIAL: "Official Joke API",
                     PROVIDER_GEEKJOKES: "Geek Jokes (⚠️ not family-friendly)",
                     PROVIDER_YOMAMA: "Yo Mama Jokes (⚠️ not family-friendly)",
+                    PROVIDER_WITZAPI: "WitzAPI (German)",
+                    PROVIDER_DEINEMUTTER: "Deine-Mutter-API (German, ⚠️ not family-friendly)",
                 }),
                 vol.Optional(
                     CONF_JOKEAPI_LANGUAGE,
